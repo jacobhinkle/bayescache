@@ -1,7 +1,7 @@
+import typing
 import collections.abc as abc
 import numpy as np
 import pandas as pd
-import typing
 
 import torch
 
