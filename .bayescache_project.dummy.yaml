@@ -1,12 +1,12 @@
  storage:
-   name: vel.storage.classic
+   name: bayescache.storage.classic
 
    backend:
-     name: vel.storage.backend.dummy
+     name: bayescache.storage.backend.dummy
 
    streaming:
-     - name: vel.storage.streaming.stdout
+     - name: bayescache.storage.streaming.stdout
 
 
  checkpoint_strategy:
-   name: vel.storage.strategy.classic_checkpoint_strategy
+   name: bayescache.storage.strategy.classic_checkpoint_strategy
