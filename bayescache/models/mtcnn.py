@@ -32,7 +32,7 @@ class Conv1d(nn.Module):
 class MTCNN(nn.Module):
 
     def __init__(self, hparams):
-        super(CNN, self).__init__()
+        super(MTCNN, self).__init__()
         self.hp = hparams
         self.embedding = nn.Embedding(
             hparams.vocab_size + 2,
