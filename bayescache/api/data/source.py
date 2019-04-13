@@ -35,19 +35,18 @@ class Source:
 class TrainingData(Source):
     """ Most common source of data combining a basic datasource and sampler """
     def __init__(self, dataset, valpercent, num_workers, batch_size, augmentations=None, random_seed=None):
-        import vel.api.data as vel_data
-
         super().__init__()
-
         self.dataset = dataset
-
         self.num_workers = num_workers
         self.batch_size = batch_size
-
         self.augmentations = augmentations
 
         # Derived values
-        self.train, self.valid = train_valid_split(self.dataset, valpercent, random_seed=random_seed)
+        self.train, self.valid = train_valid_split(
+            self.dataset,
+            valpercent,
+            random_seed=random_seed
+        )
 
         self._train_loader = data.DataLoader(
             self.train, batch_size=batch_size, shuffle=True, num_workers=num_workers
