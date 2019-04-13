@@ -1,10 +1,10 @@
 import numpy as np
 from math import floor
 
-from torch.utils.data import Dataset
+from torch.utils import data
 
 
-class DataSplitter(Dataset):
+class DataSplitter(data.Dataset):
     """
     Subset dataset by index.
 
@@ -74,8 +74,8 @@ def train_valid_split(data, valpercent=.20, random_seed=None):
     train = DataSplitter(data, train_size, train_mapping)
     valid = DataSplitter(data, valid_size, valid_mapping)
 
-    train.__repr__ = update_repr(train, 'train', len(train))
-    valid.__repr__ = update_repr(valid, 'valid', len(valid))
+#    train.__repr__ = update_repr(train, 'train', len(train))
+#    valid.__repr__ = update_repr(valid, 'valid', len(valid))
 
     return train, valid
 

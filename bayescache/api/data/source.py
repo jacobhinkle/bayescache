@@ -34,12 +34,12 @@ class Source:
 
 class TrainingData(Source):
     """ Most common source of data combining a basic datasource and sampler """
-    def __init__(self, data, valpercent, num_workers, batch_size, augmentations=None, seed=None):
+    def __init__(self, dataset, valpercent, num_workers, batch_size, augmentations=None, random_seed=None):
         import vel.api.data as vel_data
 
         super().__init__()
 
-        self.data = data
+        self.dataset = dataset
 
         self.num_workers = num_workers
         self.batch_size = batch_size
@@ -47,14 +47,14 @@ class TrainingData(Source):
         self.augmentations = augmentations
 
         # Derived values
-        train, valid = train_valid_split(data, valpercent, seed=seed)
+        self.train, self.valid = train_valid_split(self.dataset, valpercent, random_seed=random_seed)
 
         self._train_loader = data.DataLoader(
-            train, batch_size=batch_size, shuffle=True, num_workers=num_workers
+            self.train, batch_size=batch_size, shuffle=True, num_workers=num_workers
         )
 
         self._val_loader = data.DataLoader(
-            valid, batch_size=batch_size, shuffle=False, num_workers=num_workers
+            self.valid, batch_size=batch_size, shuffle=False, num_workers=num_workers
         )
 
     def train_loader(self):
@@ -67,11 +67,11 @@ class TrainingData(Source):
 
     def train_dataset(self):
         """ Return the training dataset """
-        return self.train_ds
+        return self.train
 
     def val_dataset(self):
         """ Return the validation dataset """
-        return self.val_ds
+        return self.valid
 
     def train_iterations_per_epoch(self):
         """ Return number of iterations per epoch """
