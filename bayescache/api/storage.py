@@ -1,4 +1,4 @@
-from vel.api import EpochInfo, TrainingInfo, Model
+from bayescache.api import EpochInfo, TrainingInfo, Model
 
 
 class Storage:
