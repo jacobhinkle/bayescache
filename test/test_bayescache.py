@@ -2,7 +2,7 @@
 Tests for `bayescache` module.
 """
 import pytest
-from bayescache import bayescache
+from bayescache import launch
 
 
 class TestBayescache(object):
