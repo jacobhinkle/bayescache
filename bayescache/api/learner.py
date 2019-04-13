@@ -45,7 +45,7 @@ class Learner:
         epoch_info.on_epoch_begin()
 
         lr = epoch_info.optimizer.param_groups[-1]['lr']
-        print("|-------- Epoch {:06} Lr={:.6f} ----------|".format(epoch_info.global_epoch_idx, lr))
+        print(f"|-------- Epoch {epoch_info.global_epoch_idx:06} Lr={lr:.6f} ----------|")
 
         self.train_epoch(epoch_info, source)
         epoch_info.result_accumulator.freeze_results('train')
