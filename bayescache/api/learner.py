@@ -38,7 +38,7 @@ class Learner:
         if model_state is None:
             self.model.reset_weights()
         else:
-            self.model.load_state_dict(model_state)
+            self.model.load_state_dict(model_state, strict=False)
 
     def run_epoch(self, epoch_info: EpochInfo, source: 'vel.api.Source'):
         """ Run full epoch of learning """
