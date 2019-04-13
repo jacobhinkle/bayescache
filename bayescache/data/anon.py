@@ -5,7 +5,7 @@ from torch.utils.data import Dataset
 from nlp.data.utils import download_url, makedir_exist_ok
 
 
-class Synthetic(Dataset):
+class Anon(Dataset):
     """Anonymous Synthetic Dataset.
 
     Parameters
@@ -24,10 +24,10 @@ class Synthetic(Dataset):
         downloaded again.
     """
     urls = [
-      'https://raw.githubusercontent.com/yngtodd/unlp/master/synthetic/train_data.npy',
-      'https://raw.githubusercontent.com/yngtodd/unlp/master/synthetic/train_labels.npy',
-      'https://raw.githubusercontent.com/yngtodd/unlp/master/synthetic/test_data.npy',
-      'https://raw.githubusercontent.com/yngtodd/unlp/master/synthetic/test_labels.npy'
+      'https://raw.githubusercontent.com/yngtodd/unlp/master/anon/train-data.npy',
+      'https://raw.githubusercontent.com/yngtodd/unlp/master/anon/train-labels.npy',
+      'https://raw.githubusercontent.com/yngtodd/unlp/master/anon/test-data.npy',
+      'https://raw.githubusercontent.com/yngtodd/unlp/master/anon/test-labels.npy'
     ]
 
     training_data_file= 'train_data.npy'
@@ -35,9 +35,8 @@ class Synthetic(Dataset):
     test_data_file = 'test_data.npy'
     test_label_file = 'test_labels.npy'
 
-    def __init__(self, root, partition, target=None, transform=None, target_transform=None, download=False):
+    def __init__(self, root, partition, transform=None, target_transform=None, download=False):
         self.root = os.path.expanduser(root)
-        self.target = target
         self.transform = transform
         self.target_transform = target_transform
 
@@ -50,37 +49,19 @@ class Synthetic(Dataset):
 
         self.partition = partition
         if self.partition == 'train':
-            self.data_file = self.training_data_file
-            self.label_file = self.training_label_file
+            data_file = self.training_data_file
+            label_file = self.training_label_file
         elif self.partition == 'test':
-            self.data_file = self.test_data_file
-            self.label_file = self.test_label_file
+            data_file = self.test_data_file
+            label_file = self.test_label_file
         else:
             raise ValueError("Partition must either be 'train' or 'test'.")
 
-        self.data = np.load(os.path.join(self.processed_folder, self.data_file))
-        self.targets = self.load_targets(self.target) 
+        self.data = np.load(os.path.join(self.processed_folder, data_file))
+        self.targets = np.load(os.path.join(self.processed_folder, label_file))
 
     def __len__(self):
         return len(self.data)
-
-    def load_targets(self, target=None):
-        """
-        Load targets.
-
-        Parameters
-        ----------
-        target : int
-            specify a single task rather than multitask.
-            Must be [0,3].
-        """
-        targets = np.load(os.path.join(self.processed_folder, self.label_file))
-
-        if target is not None:
-            print(f'Loading target {target}')
-            targets = targets[:, target]
-
-        return targets
 
     def load_data(self):
         return self.data, self.targets
@@ -150,12 +131,12 @@ class Synthetic(Dataset):
         print('Processing...')
 
         training_set = (
-            np.load(os.path.join(self.raw_folder, 'train_data.npy')),
-            np.load(os.path.join(self.raw_folder, 'train_labels.npy'))
+            np.load(os.path.join(self.raw_folder, 'train-data.npy')),
+            np.load(os.path.join(self.raw_folder, 'train-labels.npy'))
         )
         test_set = (
-            np.load(os.path.join(self.raw_folder, 'test_data.npy')),
-            np.load(os.path.join(self.raw_folder, 'test_labels.npy'))
+            np.load(os.path.join(self.raw_folder, 'test-data.npy')),
+            np.load(os.path.join(self.raw_folder, 'test-labels.npy'))
         )
 
         # Save processed training data
