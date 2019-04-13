@@ -5,7 +5,7 @@ import typing
 
 import torch
 
-#from vel.exceptions import VelException
+from bayescache.exceptions import BayesCacheException
 
 
 class TrainingHistory:
@@ -222,7 +222,7 @@ class EpochInfo(abc.MutableMapping):
     def result(self) -> dict:
         """ Result of the epoch """
         if self._result is None:
-            #raise VelException("Result has not been frozen yet")
+            raise BayesCacheException("Result has not been frozen yet")
             pass
         else:
             return self._result
