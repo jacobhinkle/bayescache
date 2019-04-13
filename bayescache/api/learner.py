@@ -8,7 +8,7 @@ from .info import BatchInfo, EpochInfo, TrainingInfo
 
 class Learner:
     """ Manages training process of a single model """
-    def __init__(self, device: torch.device, model, max_grad_norm: typing.Optional[float]=None):
+    def __init__(self, model, device: torch.device, max_grad_norm: typing.Optional[float]=None):
         self.device = device
         self.model = model.to(device)
         self.max_grad_norm = max_grad_norm
