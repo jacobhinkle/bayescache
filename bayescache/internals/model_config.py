@@ -2,7 +2,7 @@ import datetime as dtm
 import os.path
 
 # Look into internals for bayescache
-from vel.exceptions import VelInitializationException
+from bayescache.exceptions import InitializationException
 from vel.internals.parser import Parser
 from vel.internals.provider import Provider
 
@@ -14,7 +14,7 @@ class ModelConfig:
     Is a frontend for the provider, resolving all dependency-injection requests.
     """
 
-    PROJECT_FILE_NAME = '.velproject.yaml'
+    PROJECT_FILE_NAME = '.bayescache_project.yaml'
 
     @staticmethod
     def find_project_directory(start_path) -> str:
