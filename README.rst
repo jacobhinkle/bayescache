@@ -15,14 +15,14 @@
     :target: https://travis-ci.org/yngtodd/bayescache
 
 
-=============================
+==========
 BayesCache
-=============================
+==========
 
 Save cache, Bae will you love you.
 
 Documentation
---------------
+-------------
  
 For references, tutorials, and examples check out our `documentation`_.
 
