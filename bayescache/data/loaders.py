@@ -17,11 +17,11 @@ class DataSplitter(Dataset):
     length : int
         Number of samples in subset.
 
-    mapping : list 
-        Indices of the original data to be used in subset. 
+    mapping : list
+        Indices of the original data to be used in subset.
     """
     def __init__(self, data, length, mapping):
-        self.data = data 
+        self.data = data
         self.length = length
         self.mapping = mapping
 
@@ -54,7 +54,7 @@ def train_valid_split(data, valpercent=.20, random_seed=None):
     Returns
     -------
     train : torch.utils.data.Dataset instance
-        Training set. 
+        Training set.
 
     valid : torch.utils.data.Dataset instance
         Validation set.
@@ -74,4 +74,15 @@ def train_valid_split(data, valpercent=.20, random_seed=None):
     train = DataSplitter(data, train_size, train_mapping)
     valid = DataSplitter(data, valid_size, valid_mapping)
 
+    train.__repr__ = update_repr(train, 'train', len(train))
+    valid.__repr__ = update_repr(valid, 'valid', len(valid))
+
     return train, valid
+
+
+def update_repr(data, partition, n_samples):
+    fmt_str = 'Dataset ' + data.__class__.__name__ + '\n'
+    fmt_str += '    Number of datapoints: {}\n'.format(n_samples)
+    fmt_str += '    Split: {}\n'.format(partition)
+    fmt_str += '    Root Location: {}\n'.format(data.data.root)
+    return fmt_str
