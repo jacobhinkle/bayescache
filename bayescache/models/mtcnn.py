@@ -1,6 +1,8 @@
 import torch
 import torch.nn as nn
 
+from bayescache.api.model import SupervisedModel
+
 
 class Hyperparameters:
     kernel1 = 3
@@ -45,7 +47,7 @@ class Embedding(nn.Module):
         return self.embedding(x)
 
 
-class MTCNN(nn.Module):
+class MTCNN(SupervisedModel):
 
     def __init__(self, hparams):
         super(MTCNN, self).__init__()
@@ -79,7 +81,7 @@ def new(hyperparameters=None, savefile=None):
     else:
         hparams = Hyperparameters()
 
-    model = CNN(hparams)
+    model = MTCNN(hparams)
 
     if savefile:
         model.load_state_dict(savefile, strict=False)
