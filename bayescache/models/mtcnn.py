@@ -11,6 +11,7 @@ class Hyperparameters:
     n_filters3 = 300
     vocab_size = 3000
     word_dim = 100
+    max_sent_len = 150
 
 
 class Conv1d(nn.Module):
@@ -49,11 +50,7 @@ class MTCNN(nn.Module):
     def __init__(self, hparams):
         super(MTCNN, self).__init__()
         self.hp = hparams
-        self.embedding = nn.Embedding(
-            hparams.vocab_size + 2,
-            hparams.word_dim,
-            padding_idx=0
-        )
+        self.embedding = Embedding(hparams.vocab_size, hparams.word_dim)
         self.conv1 = Conv1d(hparams.n_filters1, hparams.kernel1)
         self.conv2 = Conv1d(hparams.n_filters2, hparams.kernel2)
         self.conv3 = Conv1d(hparams.n_filters3, hparams.kernel3)
@@ -63,7 +60,7 @@ class MTCNN(nn.Module):
         return self.hp.n_filters1 + self.hp.n_filters2 + self.hp.n_filters3
 
     def forward(self, x):
-        x = self.embedding(x).view(-1, 1, self.word_dim * self.max_sent_len)
+        x = self.embedding(x).view(-1, 1, self.hp.word_dim * self.hp.max_sent_len)
 
         conv_results = []
         conv_results.append(nn.ReLU(self.conv1(x)).view(-1, self.hp.n_filters1))
