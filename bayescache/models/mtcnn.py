@@ -14,7 +14,7 @@ class Hyperparameters:
 
 
 class Conv1d(nn.Module):
-    """Module allows us to save the name of our layers for cache."""
+    """Wrapper allows us to save the name of our layers for cache."""
 
     def __init__(self, out_channels, kernel_size):
         super(Conv1d, self).__init__()
@@ -27,6 +27,21 @@ class Conv1d(nn.Module):
 
     def forward(self, x):
         return self.conv(x)
+
+
+class Embedding(nn.Module):
+    """Wrapper for embedding to save names in cache."""
+    def __init__(self, vocab_size, word_dim):
+        super(Embedding, self).__init__()
+
+        self.emb = nn.Sequential()
+        self.emb.add_module(
+            f"embedding_{str(vocab_size)}_{str(word_dim)}",
+            nn.Embedding(vocab_size + 2, word_dim, padding_idx=0)
+        )
+
+    def forward(self, x):
+        return self.embedding(x)
 
 
 class MTCNN(nn.Module):
