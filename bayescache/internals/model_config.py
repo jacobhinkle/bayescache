@@ -1,10 +1,9 @@
-import datetime as dtm
 import os.path
+import datetime as dtm
 
-# Look into internals for bayescache
+from bayescache.internals.parser import Parser
+from bayescache.internals.provider import Provider
 from bayescache.exceptions import InitializationException
-from vel.internals.parser import Parser
-from vel.internals.provider import Provider
 
 
 # TODO: Update ModelConfig to read TOML format.
