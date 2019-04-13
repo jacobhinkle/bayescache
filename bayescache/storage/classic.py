@@ -159,7 +159,7 @@ class ClassicStorage(Storage):
 
 
 def create(model_config, backend, checkpoint_strategy, streaming=None):
-    """ Vel factory function """
+    """factory function """
     return ClassicStorage(
         model_config=model_config,
         backend=backend,

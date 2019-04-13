@@ -1,4 +1,4 @@
-from vel.api import EpochInfo, Callback
+from bayescache.api import EpochInfo, Callback
 
 
 class StdoutStreaming(Callback):
@@ -39,5 +39,5 @@ class StdoutStreaming(Callback):
 
 
 def create():
-    """ Vel factory function """
+    """factory function """
     return StdoutStreaming()
