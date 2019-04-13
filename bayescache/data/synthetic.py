@@ -2,7 +2,7 @@ import os
 import numpy as np
 
 from torch.utils.data import Dataset
-from nlp.data.utils import download_url, makedir_exist_ok
+from bayescache.data.utils import download_url, makedir_exist_ok
 
 
 class Synthetic(Dataset):
@@ -59,7 +59,7 @@ class Synthetic(Dataset):
             raise ValueError("Partition must either be 'train' or 'test'.")
 
         self.data = np.load(os.path.join(self.processed_folder, self.data_file))
-        self.targets = self.load_targets(self.target) 
+        self.targets = self.load_targets(self.target)
 
     def __len__(self):
         return len(self.data)

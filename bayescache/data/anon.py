@@ -2,7 +2,7 @@ import os
 import numpy as np
 
 from torch.utils.data import Dataset
-from nlp.data.utils import download_url, makedir_exist_ok
+from bayescache.data.utils import download_url, makedir_exist_ok
 
 
 class Anon(Dataset):
