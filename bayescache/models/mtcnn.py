@@ -87,10 +87,6 @@ class MTCNN(SupervisedModel):
         return logits
 
 
-def shape(x):
-    print(f'layer has shape: {x.shape}')
-
-
 def new(hyperparameters=None, savefile=None):
     """Create new MTCNN model."""
     if hyperparameters:
