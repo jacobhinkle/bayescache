@@ -4,7 +4,7 @@ import re
 import torch
 
 
-from bayescahce.api import ModelConfig, EpochInfo, TrainingInfo, Model, Storage
+from bayescache.api import ModelConfig, EpochInfo, TrainingInfo, Model, Storage
 from .strategy.checkpoint_strategy import CheckpointStrategy
 
 

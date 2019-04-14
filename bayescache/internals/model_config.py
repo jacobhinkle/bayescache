@@ -13,7 +13,7 @@ class ModelConfig:
     Is a frontend for the provider, resolving all dependency-injection requests.
     """
 
-    PROJECT_FILE_NAME = '.bayescache_project.yaml'
+    PROJECT_FILE_NAME = '.bayescache_project.dummy.yaml'
 
     @staticmethod
     def find_project_directory(start_path) -> str:

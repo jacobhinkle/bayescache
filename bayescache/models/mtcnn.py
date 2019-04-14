@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-from bayescache.api.model import SupervisedModel
+from bayescache.api import SupervisedModel, ModelFactory
 
 
 class Hyperparameters:
@@ -87,3 +87,15 @@ def new(hyperparameters=None, savefile=None):
         model.load_state_dict(savefile, strict=False)
 
     return model
+
+
+def create(hyperparameters=None):
+    """ Vel factory function """
+    def instantiate(**_):
+        if hyperparameters:
+            hparams = hyperparameters
+        else:
+            hparams = Hyperparameters()
+        return MTCNN(hparams)
+
+    return ModelFactory.generic(instantiate)
