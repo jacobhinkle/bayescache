@@ -2,7 +2,7 @@ from bayescache.data.anon import Anon
 from bayescache.api import TrainingData
 
 
-def create(model_config, batch_size, normalize=True, num_workers=0, augmentations=None):
+def create(model_config, batch_size, num_workers=0, augmentations=None):
     """ Create an Anon dataset."""
     path = model_config.data_dir('anon')
 
