@@ -94,8 +94,11 @@ def create(hyperparameters=None):
     def instantiate(**_):
         if hyperparameters:
             hparams = hyperparameters
+            print(hparams)
         else:
             hparams = Hyperparameters()
+
+        #print(type(hparams))
         return MTCNN(hparams)
 
     return ModelFactory.generic(instantiate)
