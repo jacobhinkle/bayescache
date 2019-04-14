@@ -52,14 +52,19 @@ class Embedding(nn.Module):
 
 class MTCNN(SupervisedModel):
 
-    def __init__(self, hparams):
+    def __init__(self, hparams, subsite_size=34, laterality_size=4,
+                 behavior_size=3, histology_size=44, grade_size=5):
         super(MTCNN, self).__init__()
         self.hp = hparams
         self.embedding = Embedding(hparams.vocab_size, hparams.word_dim)
         self.conv1 = Conv1d(hparams.n_filters1, hparams.kernel1)
         self.conv2 = Conv1d(hparams.n_filters2, hparams.kernel2)
         self.conv3 = Conv1d(hparams.n_filters3, hparams.kernel3)
-        self.fc = nn.Linear(self._sum_filters(), 10)
+        self.fc1 = nn.Linear(self._sum_filters(), subsite_size)
+        self.fc2 = nn.Linear(self._sum_filters(), laterality_size)
+        self.fc3 = nn.Linear(self._sum_filters(), behavior_size)
+        self.fc4 = nn.Linear(self._sum_filters(), histology_size)
+        self.fc5 = nn.Linear(self._sum_filters(), grade_size)
 
     def _sum_filters(self):
         return self.hp.n_filters1 + self.hp.n_filters2 + self.hp.n_filters3
@@ -73,8 +78,13 @@ class MTCNN(SupervisedModel):
         conv_results.append(self.conv2(x).view(-1, self.hp.n_filters3))
         x = torch.cat(conv_results, 1)
 
-        x = self.fc(x)
-        return x
+        logits = {}
+        logits['subsite'] = self.fc1(x)
+        logits['laterality'] = self.fc2(x)
+        logits['behavior'] = self.fc3(x)
+        logits['histology'] = self.fc4(x)
+        logits['grade'] = self.fc5(x)
+        return logits
 
 
 def shape(x):
