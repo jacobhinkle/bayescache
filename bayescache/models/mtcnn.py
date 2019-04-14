@@ -78,12 +78,13 @@ class MTCNN(SupervisedModel):
         conv_results.append(self.conv2(x).view(-1, self.hp.n_filters3))
         x = torch.cat(conv_results, 1)
 
-        logits = {}
-        logits['subsite'] = self.fc1(x)
-        logits['laterality'] = self.fc2(x)
-        logits['behavior'] = self.fc3(x)
-        logits['histology'] = self.fc4(x)
-        logits['grade'] = self.fc5(x)
+        subsite = self.fc1(x)
+        laterality = self.fc2(x)
+        behavior = self.fc3(x)
+        histology = self.fc4(x)
+        grade = self.fc5(x)
+
+        logits = [subsite, laterality, behavior, histology, grade]
         return logits
 
 
