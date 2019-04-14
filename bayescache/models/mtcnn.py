@@ -108,6 +108,7 @@ def create(hyperparameters=None):
         if hyperparameters:
             hparams = hyperparameters
             print(hparams)
+            print(type(hparams))
         else:
             hparams = Hyperparameters()
 
