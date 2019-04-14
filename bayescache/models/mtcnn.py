@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 from bayescache.api import SupervisedModel, ModelFactory
 
@@ -11,9 +12,9 @@ class Hyperparameters:
     n_filters1 = 300
     n_filters2 = 300
     n_filters3 = 300
-    vocab_size = 3000
-    word_dim = 100
-    max_sent_len = 150
+    vocab_size = 35095
+    word_dim = 300
+    max_sent_len =3000
 
 
 class Conv1d(nn.Module):
@@ -29,7 +30,9 @@ class Conv1d(nn.Module):
         )
 
     def forward(self, x):
-        return self.conv(x)
+        x = F.relu(self.conv(x))
+        x = F.adaptive_max_pool1d(x, output_size=1)
+        return x
 
 
 class Embedding(nn.Module):
@@ -40,7 +43,7 @@ class Embedding(nn.Module):
         self.emb = nn.Sequential()
         self.emb.add_module(
             f"embedding_{str(vocab_size)}_{str(word_dim)}",
-            nn.Embedding(vocab_size + 2, word_dim, padding_idx=0)
+            nn.Embedding(vocab_size, word_dim, padding_idx=0)
         )
 
     def forward(self, x):
@@ -62,16 +65,20 @@ class MTCNN(SupervisedModel):
         return self.hp.n_filters1 + self.hp.n_filters2 + self.hp.n_filters3
 
     def forward(self, x):
-        x = self.embedding(x).view(-1, 1, self.hp.word_dim * self.hp.max_sent_len)
+        x = self.embedding.emb(x).view(-1, 1, self.hp.word_dim * self.hp.max_sent_len)
 
         conv_results = []
-        conv_results.append(nn.ReLU(self.conv1(x)).view(-1, self.hp.n_filters1))
-        conv_results.append(nn.ReLU(self.conv2(x)).view(-1, self.hp.n_filters2))
-        conv_results.append(nn.ReLU(self.conv2(x)).view(-1, self.hp.n_filters3))
+        conv_results.append(self.conv1(x).view(-1, self.hp.n_filters1))
+        conv_results.append(self.conv2(x).view(-1, self.hp.n_filters2))
+        conv_results.append(self.conv2(x).view(-1, self.hp.n_filters3))
         x = torch.cat(conv_results, 1)
 
         x = self.fc(x)
         return x
+
+
+def shape(x):
+    print(f'layer has shape: {x.shape}')
 
 
 def new(hyperparameters=None, savefile=None):
