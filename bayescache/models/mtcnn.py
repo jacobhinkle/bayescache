@@ -50,7 +50,7 @@ class Embedding(nn.Module):
         return self.embedding(x)
 
 
-class MTCNN(SupervisedModel):
+class MTCNN(MultiTaskSupervisedModel):
 
     def __init__(self, hparams, subsite_size=34, laterality_size=4,
                  behavior_size=3, histology_size=44, grade_size=5):
