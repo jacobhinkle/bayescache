@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from bayescache.api import SupervisedModel, ModelFactory
+from bayescache.api import MultiTaskSupervisedModel, ModelFactory
 
 
 class Hyperparameters:

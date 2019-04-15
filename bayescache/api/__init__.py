@@ -3,7 +3,9 @@ from .info import BatchInfo, EpochInfo, TrainingInfo
 from .learner import Learner
 
 from .model import (
-    Model, BackboneModel, LinearBackboneModel, SupervisedModel, RnnLinearBackboneModel, RnnModel, RnnSupervisedModel
+    Model, BackboneModel, LinearBackboneModel, SupervisedModel, 
+    MultiTaskSupervisedModel, RnnLinearBackboneModel, RnnModel, 
+    RnnSupervisedModel
 )
 from .model_factory import ModelFactory
 from .optimizer import OptimizerFactory
