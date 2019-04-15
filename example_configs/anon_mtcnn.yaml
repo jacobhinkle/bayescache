@@ -27,11 +27,14 @@ commands:
     log_frequency: 100
 
     optimizer:
-      name: vel.optimizers.adadelta
+      name: bayescache.optimizers.adadelta
 
     checkpoint:
       metric: 'val:loss'
 
+  summary:
+    name: bayescache.commands.summary_command
+
 
   visdom:
-    name: vel.commands.vis_store_command
+    name: bayescache.commands.vis_store_command
