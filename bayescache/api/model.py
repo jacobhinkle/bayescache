@@ -146,6 +146,23 @@ class SupervisedModel(Model):
         raise NotImplementedError
 
 
+class MultiTaskSupervisedModel(Model):
+    """ Model for a supervised learning problem """
+    def loss(self, x_data, y_true):
+        """ Forward propagate network and return a value of loss function """
+        y_pred = self(x_data)
+        losses = []
+        for i in range(len(y_true)):
+            task_loss = self.loss_value(x_data, y_true[i], y_pred[i])
+            losses.append(loss)
+        loss = sum(losses)
+        return y_pred, loss 
+
+    def loss_value(self, x_data, y_true, y_pred):
+        """ Calculate a value of loss function """
+        raise NotImplementedError
+
+
 class RnnSupervisedModel(RnnModel):
     """ Model for a supervised learning problem """
 
