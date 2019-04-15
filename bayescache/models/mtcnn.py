@@ -2,6 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from bayescache.metrics.loss_metric import Loss
+from bayescache.metrics.accuracy import Accuracy
 from bayescache.api import MultiTaskSupervisedModel, ModelFactory
 
 
@@ -68,6 +70,14 @@ class MTCNN(MultiTaskSupervisedModel):
 
     def _sum_filters(self):
         return self.hp.n_filters1 + self.hp.n_filters2 + self.hp.n_filters3
+
+    def loss_value(self, x_data, y_true, y_pred):
+        """ Calculate a value of loss function """
+        return F.nll_loss(y_pred, y_true)
+
+    def metrics(self):
+        """ Set of metrics for this model """
+        return [Loss(), Accuracy()]
 
     def forward(self, x):
         x = self.embedding.emb(x).view(-1, 1, self.hp.word_dim * self.hp.max_sent_len)
