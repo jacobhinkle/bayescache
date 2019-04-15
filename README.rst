@@ -26,6 +26,16 @@ Documentation
  
 For references, tutorials, and examples check out our `documentation`_.
 
+Usage
+-----
+
+The command line interface for BayesCache is as follows:
+
+.. code-block:: console
+
+    python -m bayescache.launch CONFIGFILE COMMAND --device PYTORCH_DEVICE -r RUN_NUMBER -s SEED
+
+
 Installation
 ------------
 
