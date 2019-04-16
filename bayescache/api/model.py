@@ -153,7 +153,8 @@ class MultiTaskSupervisedModel(Model):
         y_pred = self(x_data)
         losses = []
         for i in range(len(y_true)):
-            task_loss = self.loss_value(x_data, y_true[i], y_pred[i])
+            # Indexing with MTCNN's data is tricky when it comes to labels.
+            task_loss = self.loss_value(x_data, torch.tensor(y_true[:,i]), F.softmax(y_pred[i]))
             losses.append(loss)
         loss = sum(losses)
         return y_pred, loss 

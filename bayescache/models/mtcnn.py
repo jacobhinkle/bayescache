@@ -73,7 +73,7 @@ class MTCNN(SupervisedModel):
 
     def loss_value(self, x_data, y_true, y_pred):
         """ Calculate a value of loss function """
-        return F.nll_loss(y_pred, y_true)
+        return F.cross_entropy(y_pred, y_true)
 
     def metrics(self):
         """ Set of metrics for this model """
