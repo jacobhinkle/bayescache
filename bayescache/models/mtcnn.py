@@ -4,7 +4,7 @@ import torch.nn.functional as F
 
 from bayescache.metrics.loss_metric import Loss
 from bayescache.metrics.accuracy import Accuracy
-from bayescache.api import MultiTaskSupervisedModel, ModelFactory
+from bayescache.api import MultiTaskSupervisedModel, SupervisedModel, ModelFactory
 
 
 class Hyperparameters:
@@ -52,10 +52,10 @@ class Embedding(nn.Module):
         return self.embedding(x)
 
 
-class MTCNN(MultiTaskSupervisedModel):
+class MTCNN(SupervisedModel):
 
-    def __init__(self, hparams, subsite_size=34, laterality_size=4,
-                 behavior_size=3, histology_size=44, grade_size=5):
+    def __init__(self, hparams, subsite_size=6, laterality_size=2,
+                 behavior_size=2, histology_size=3, grade_size=5):
         super(MTCNN, self).__init__()
         self.hp = hparams
         self.embedding = Embedding(hparams.vocab_size, hparams.word_dim)
@@ -66,7 +66,7 @@ class MTCNN(MultiTaskSupervisedModel):
         self.fc2 = nn.Linear(self._sum_filters(), laterality_size)
         self.fc3 = nn.Linear(self._sum_filters(), behavior_size)
         self.fc4 = nn.Linear(self._sum_filters(), histology_size)
-        self.fc5 = nn.Linear(self._sum_filters(), grade_size)
+        #self.fc5 = nn.Linear(self._sum_filters(), grade_size)
 
     def _sum_filters(self):
         return self.hp.n_filters1 + self.hp.n_filters2 + self.hp.n_filters3
@@ -92,9 +92,9 @@ class MTCNN(MultiTaskSupervisedModel):
         laterality = self.fc2(x)
         behavior = self.fc3(x)
         histology = self.fc4(x)
-        grade = self.fc5(x)
+        #grade = self.fc5(x)
 
-        logits = [subsite, laterality, behavior, histology, grade]
+        logits = [subsite, laterality, behavior, histology]
         return logits
 
 

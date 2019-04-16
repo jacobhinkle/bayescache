@@ -22,6 +22,13 @@ class Synthetic(Dataset):
         If true, downloads the dataset from the internet and
         puts it in root directory. If dataset is already downloaded, it is not
         downloaded again.
+
+    Notes
+    -----
+    The synthetic data has a vocabulary of 4014 tokens. Each document length is padded out 
+    to 1500 tokens. There are 4 tasks stored as indices in the labels tensor; task 0 (index 
+    0 in the labels tensor) has 6 classes. Task 1 and 2 both have two classes. Task 3 has
+    3 classes.
     """
     urls = [
       'https://raw.githubusercontent.com/yngtodd/unlp/master/synthetic/train_data.npy',
@@ -97,7 +104,7 @@ class Synthetic(Dataset):
         (document, target) : tuple
            where target is index of the target class.
         """
-        document, target = self.data[idx], int(self.targets[idx])
+        document, target = self.data[idx], self.targets[idx]
 
 
         if self.transform is not None:
