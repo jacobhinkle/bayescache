@@ -39,6 +39,11 @@ setup(
     license='MIT',
     zip_safe=False,
     keywords='bayescache',
+    entry_points={
+        'console_scripts': [
+            'bayescache = bayescache.launch:main',
+        ],
+    },
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
