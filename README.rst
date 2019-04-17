@@ -21,7 +21,7 @@ BayesCache
 
 Save cache, Bae will you love you.
 
-This project owes a great debt to `MillionIntegrals`_ `Vel`_ project. I have basically been
+This project owes a great debt to the `Vel`_ project from `MillionIntegrals`_. I have basically been
 pulling his API to better understand it. As of right now, this API is nearly identical to that
 project. Things may be adapted and diverge from `Vel` as time goes on in order to suit specific needs.
 
