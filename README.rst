@@ -65,5 +65,5 @@ Once you have a copy of the source, you can install it with:
 
 .. _tarball: https://github.com/yngtodd/bayescache/tarball/master
 .. _documentation: https://bayescache.readthedocs.io/en/latest
-.. _MillionIntervals: https://github.com/MillionIntegrals
+.. _MillionIntegrals: https://github.com/MillionIntegrals
 .. _Vel: https://github.com/MillionIntegrals/vel
