@@ -44,3 +44,6 @@ docs/_build
 
 # Data directory
 data/
+
+# Visual Studio
+.vscode/
