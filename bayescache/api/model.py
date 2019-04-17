@@ -16,7 +16,7 @@ class Model(nn.Module):
         return [Loss()]
 
     def train(self, mode=True):
-        r"""
+        """
         Sets the module in training mode.
 
         This has any effect only on certain modules. See documentations of
