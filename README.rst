@@ -21,6 +21,10 @@ BayesCache
 
 Save cache, Bae will you love you.
 
+This project owes a great debt to `MillionIntegrals`_'s `Vel`_ project. I have basically been
+pulling his API to better understand it. As of right now, this API is nearly identical to that
+project. Things may be adapted and diverge from `Vel` as time goes on in order to suit specific needs.
+
 Documentation
 -------------
  
@@ -61,3 +65,5 @@ Once you have a copy of the source, you can install it with:
 
 .. _tarball: https://github.com/yngtodd/bayescache/tarball/master
 .. _documentation: https://bayescache.readthedocs.io/en/latest
+.. _MillionIntervals: https://github.com/MillionIntegrals
+.. _Vel: https://github.com/MillionIntegrals/vel
