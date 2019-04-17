@@ -20,10 +20,8 @@ commands:
     checkpoint:
       metric: 'val:loss'
 
-
   summary:
     name: bayescache.commands.summary_command
-
 
   visdom:
     name: bayescache.commands.vis_store_command
