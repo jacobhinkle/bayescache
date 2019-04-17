@@ -1,0 +1,29 @@
+name: 'mnist_cnn'
+
+model:
+  name: bayescache.models.cnn 
+
+source:
+  name: bayescache.sources.mnist
+  batch_size: 128
+  num_workers: 4
+
+commands:
+  train:
+    name: bayescache.commands.train_command
+    epochs: 10
+    log_frequency: 1
+
+    optimizer:
+      name: bayescache.optimizers.adadelta
+
+    checkpoint:
+      metric: 'val:loss'
+
+
+  summary:
+    name: bayescache.commands.summary_command
+
+
+  visdom:
+    name: bayescache.commands.vis_store_command

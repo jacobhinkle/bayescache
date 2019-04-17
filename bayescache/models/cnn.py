@@ -41,14 +41,14 @@ class CNN(SupervisedModel):
         return F.log_softmax(x, dim=1)
 
 
-def new(hyperparameters=None, savefile=None):
+def new(hyperparameters=None, num_classes=10, savefile=None):
     """Create new MTCNN model."""
     if hyperparameters:
         hparams = hyperparameters
     else:
         hparams = Hyperparameters()
 
-    model = CNN(hparams)
+    model = CNN(hparams, num_classes)
 
     if savefile:
         model.load_state_dict(savefile, strict=False)

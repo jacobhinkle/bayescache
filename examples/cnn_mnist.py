@@ -17,12 +17,12 @@ def main():
     args = parser.parse_args()
 
     model = cnn.new()
-    learner = api.Learner(device='cpu', model=model)
-    source = mnist.new(args.datapath, batch_size=1)
+    learner = api.Learner(device='cuda:0', model=model)
+    source = mnist.new(args.datapath, batch_size=128)
     optimizer = optim.RMSprop(model.parameters(), lr=7.0e-4, eps=1e-3)
 
     metrics = learner.metrics()
-    callbacks = [TimeTracker()]
+    callbacks = []
 
     training_info = api.TrainingInfo(
         start_epoch_idx=0,
@@ -33,7 +33,7 @@ def main():
 
     training_info.on_train_begin()
 
-    for global_epoch_idx in range(training_info.start_epoch_idx + 1, 1 + 1):
+    for global_epoch_idx in range(training_info.start_epoch_idx + 1, 1+10):
         epoch_info = api.EpochInfo(
             training_info=training_info,
             global_epoch_idx=global_epoch_idx,
@@ -42,7 +42,7 @@ def main():
         )
 
         # Execute learning
-        learner.train_epoch(epoch_info, source)
+        learner.run_epoch(epoch_info, source)
 
 
 if __name__=='__main__':
