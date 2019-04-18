@@ -35,10 +35,16 @@ class P3B3(Dataset):
     test_data_file = 'test_data.npy'
     test_label_file = 'test_labels.npy'
 
-    def __init__(self, root, partition, transform=None, target_transform=None, download=False):
+    def __init__(self, root, partition, subsite=True, 
+                 laterality=True, histology=True, grade=True,
+                 transform=None, target_transform=None, download=False):
         self.root = os.path.expanduser(root)
         self.transform = transform
         self.target_transform = target_transform
+        self.subsite = subsite
+        self.laterality = laterality
+        self.histology = histology
+        self.grade = grade
 
         if download:
             self.download()
@@ -58,13 +64,29 @@ class P3B3(Dataset):
             raise ValueError("Partition must either be 'train' or 'test'.")
 
         self.data = np.load(os.path.join(self.processed_folder, data_file))
-        self.targets = np.load(os.path.join(self.processed_folder, label_file))
+        self.targets = self.get_targets() 
 
     def __len__(self):
         return len(self.data)
 
     def load_data(self):
         return self.data, self.targets
+
+    def get_targets(self):
+        """Get dictionary of targets specified by user."""
+        targets = np.load(os.path.join(self.processed_folder, label_file))
+
+        tasks = {}
+        if self.subsite:
+            tasks['subsite'] = targets[:,0]
+        if self.laterality:
+            tasks['laterality'] = targets[:,1]
+        if self.histology:
+            tasks['histology'] = targets[:,2]
+        if self.grade:
+            tasks['grade'] = targets[:,3]
+        
+        return tasks
 
     def __getitem__(self, idx):
         """
@@ -78,12 +100,15 @@ class P3B3(Dataset):
         (document, target) : tuple
            where target is index of the target class.
         """
-        document, target = self.data[idx], self.targets[idx]
-
+        document = self.data[idx]
 
         if self.transform is not None:
             document = self.transform(document)
 
+        targets = {}
+        for key, value in self.targets:
+            subset = value[idx] 
+            targets[key] = subset
 
         if self.target_transform is not None:
             target = self.target_transform(target)
