@@ -52,7 +52,7 @@ class Embedding(nn.Module):
         return self.embedding(x)
 
 
-class MTCNN(SupervisedModel):
+class MTCNN(MutliTaskSupervisedModel):
 
     def __init__(self, hparams, subsite_size=6, laterality_size=2,
                  behavior_size=2, histology_size=3, grade_size=5):
@@ -71,9 +71,27 @@ class MTCNN(SupervisedModel):
     def _sum_filters(self):
         return self.hp.n_filters1 + self.hp.n_filters2 + self.hp.n_filters3
 
-    def loss_value(self, x_data, y_true, y_pred):
+    def loss_value(self, x_data, y_true, y_pred, reduce='sum'):
         """ Calculate a value of loss function """
-        return F.cross_entropy(y_pred, y_true)
+        y_pred = self(x_data)
+
+        losses = {}
+        for key, value in y_true:
+            # TODO: test this bad boy.
+            # y_true and y_pred must have the same keys.
+            losses[key] = F.cross_entropy(F.softmax(y_pred[key]), y_true[key])
+
+        if reduce:
+            total = 0
+            for _, value in losses.items():
+                total += value
+            
+            if reduce == "mean":
+                losses = total / len(losses)
+            elif reduce == "sum":
+                losses = total
+
+        return losses
 
     def metrics(self):
         """ Set of metrics for this model """
@@ -88,13 +106,12 @@ class MTCNN(SupervisedModel):
         conv_results.append(self.conv2(x).view(-1, self.hp.n_filters3))
         x = torch.cat(conv_results, 1)
 
-        subsite = self.fc1(x)
-        laterality = self.fc2(x)
-        behavior = self.fc3(x)
-        histology = self.fc4(x)
-        #grade = self.fc5(x)
+        logits = {}
+        logits['subsite'] = self.fc1(x)
+        logits['laterality'] = self.fc2(x)
+        logits['behavior'] = self.fc3(x)
+        logits['histology'] = self.fc4(x)
 
-        logits = [subsite, laterality, behavior, histology]
         return logits
 
 
