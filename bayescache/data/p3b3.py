@@ -64,7 +64,7 @@ class P3B3(Dataset):
             raise ValueError("Partition must either be 'train' or 'test'.")
 
         self.data = np.load(os.path.join(self.processed_folder, data_file))
-        self.targets = self.get_targets() 
+        self.targets = self.get_targets(label_file) 
 
     def __len__(self):
         return len(self.data)
@@ -72,7 +72,7 @@ class P3B3(Dataset):
     def load_data(self):
         return self.data, self.targets
 
-    def get_targets(self):
+    def get_targets(self, label_file):
         """Get dictionary of targets specified by user."""
         targets = np.load(os.path.join(self.processed_folder, label_file))
 
@@ -106,14 +106,15 @@ class P3B3(Dataset):
             document = self.transform(document)
 
         targets = {}
-        for key, value in self.targets:
+        for key, value in self.targets.items():
             subset = value[idx] 
+
+            if self.target_transform is not None:
+                subset = self.target_transform(subset)
+
             targets[key] = subset
 
-        if self.target_transform is not None:
-            target = self.target_transform(target)
-
-        return document, target
+        return document, targets
 
     @property
     def raw_folder(self):
