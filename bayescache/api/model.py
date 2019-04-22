@@ -161,23 +161,7 @@ class MultiTaskSupervisedModel(Model):
             raise ValueError("`reduce` must be either None, `sum`, or `mean`!")
 
         y_pred = self(x_data)
-        losses = {}
-        for key, value in y_true:
-            # TODO: test this bad boy.
-            # y_true and y_pred must have the same keys.
-            losses[key] = self.loss_value(x_data, y_true[key], F.softmax(y_pred[key]))
-
-        if reduce:
-            total = 0
-            for _, value in losses.items():
-                total += value
-            
-            if reduce == "mean":
-                losses = total / len(losses)
-            elif reduce == "sum":
-                losses = total
-
-        return y_pred, losses
+        return y_pred, self.loss_value(x_data, y_true, y_pred, reduce=reduce)
 
     def loss_value(self, x_data, y_true, y_pred, reduce=None):
         """ Calculate a value of loss function """
