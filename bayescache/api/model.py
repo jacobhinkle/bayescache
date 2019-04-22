@@ -147,19 +147,23 @@ class SupervisedModel(Model):
 
 
 class MultiTaskSupervisedModel(Model):
-    """ Model for a supervised learning problem """
-    def loss(self, x_data, y_true):
-        """ Forward propagate network and return a value of loss function """
-        y_pred = self(x_data)
-        losses = []
-        for i in range(len(y_true)):
-            # Indexing with MTCNN's data is tricky when it comes to labels.
-            task_loss = self.loss_value(x_data, torch.tensor(y_true[:,i]), F.softmax(y_pred[i]))
-            losses.append(loss)
-        loss = sum(losses)
-        return y_pred, loss 
+    """ Model for a multi-task supervised learning problem.
 
-    def loss_value(self, x_data, y_true, y_pred):
+    This is similar to the SupervisedModel, but where 
+    `y_true` and `y_pred` are dictionaries with matching keys.
+    MultiTaskSupervised models have the option of reducing the loss 
+    over all tasks by either the sum or the mean.
+    """
+    def loss(self, x_data, y_true, reduce=None):
+        """ Forward propagate network and return a value of loss function """
+        # TODO: This may need to be moved to the model.
+        if reduce not in (None, 'sum', 'mean'):
+            raise ValueError("`reduce` must be either None, `sum`, or `mean`!")
+
+        y_pred = self(x_data)
+        return y_pred, self.loss_value(x_data, y_true, y_pred, reduce=reduce)
+
+    def loss_value(self, x_data, y_true, y_pred, reduce=None):
         """ Calculate a value of loss function """
         raise NotImplementedError
 

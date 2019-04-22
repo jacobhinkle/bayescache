@@ -4,7 +4,7 @@ import torch.nn.functional as F
 
 from bayescache.metrics.loss_metric import Loss
 from bayescache.metrics.accuracy import Accuracy
-from bayescache.api import MultiTaskSupervisedModel, SupervisedModel, ModelFactory
+from bayescache.api import MultiTaskSupervisedModel, ModelFactory
 
 
 class Hyperparameters:
@@ -16,7 +16,7 @@ class Hyperparameters:
     n_filters3 = 300
     vocab_size = 35095
     word_dim = 300
-    max_sent_len =3000
+    max_sent_len=1500 
 
 
 class Conv1d(nn.Module):
@@ -52,28 +52,46 @@ class Embedding(nn.Module):
         return self.embedding(x)
 
 
-class MTCNN(SupervisedModel):
+class MTCNN(MultiTaskSupervisedModel):
 
     def __init__(self, hparams, subsite_size=6, laterality_size=2,
-                 behavior_size=2, histology_size=3, grade_size=5):
+                 histology_size=2, grade_size=3):
         super(MTCNN, self).__init__()
         self.hp = hparams
         self.embedding = Embedding(hparams.vocab_size, hparams.word_dim)
         self.conv1 = Conv1d(hparams.n_filters1, hparams.kernel1)
         self.conv2 = Conv1d(hparams.n_filters2, hparams.kernel2)
         self.conv3 = Conv1d(hparams.n_filters3, hparams.kernel3)
+        # TODO: Check the names of these labels. -> must match data. 
         self.fc1 = nn.Linear(self._sum_filters(), subsite_size)
         self.fc2 = nn.Linear(self._sum_filters(), laterality_size)
-        self.fc3 = nn.Linear(self._sum_filters(), behavior_size)
-        self.fc4 = nn.Linear(self._sum_filters(), histology_size)
-        #self.fc5 = nn.Linear(self._sum_filters(), grade_size)
+        self.fc3 = nn.Linear(self._sum_filters(), histology_size)
+        self.fc4 = nn.Linear(self._sum_filters(), grade_size)
 
     def _sum_filters(self):
         return self.hp.n_filters1 + self.hp.n_filters2 + self.hp.n_filters3
 
-    def loss_value(self, x_data, y_true, y_pred):
+    def loss_value(self, x_data, y_true, y_pred, reduce=None):
         """ Calculate a value of loss function """
-        return F.cross_entropy(y_pred, y_true)
+        y_pred = self(x_data)
+
+        losses = {}
+        for key, value in y_true.items():
+            # TODO: test this bad boy.
+            # y_true and y_pred must have the same keys.
+            losses[key] = F.cross_entropy(F.softmax(y_pred[key]), y_true[key])
+
+        if reduce:
+            total = 0
+            for _, value in losses.items():
+                total += value
+            
+            if reduce == "mean":
+                losses = total / len(losses)
+            elif reduce == "sum":
+                losses = total
+
+        return losses
 
     def metrics(self):
         """ Set of metrics for this model """
@@ -88,13 +106,12 @@ class MTCNN(SupervisedModel):
         conv_results.append(self.conv2(x).view(-1, self.hp.n_filters3))
         x = torch.cat(conv_results, 1)
 
-        subsite = self.fc1(x)
-        laterality = self.fc2(x)
-        behavior = self.fc3(x)
-        histology = self.fc4(x)
-        #grade = self.fc5(x)
+        logits = {}
+        logits['subsite'] = self.fc1(x)
+        logits['laterality'] = self.fc2(x)
+        logits['histology'] = self.fc3(x)
+        logits['grade'] = self.fc4(x)
 
-        logits = [subsite, laterality, behavior, histology]
         return logits
 
 
@@ -114,7 +131,7 @@ def new(hyperparameters=None, savefile=None):
 
 
 def create(hyperparameters=None):
-    """ Vel factory function """
+    """ Bayescache factory function """
     def instantiate(**_):
         if hyperparameters:
             hparams = hyperparameters
