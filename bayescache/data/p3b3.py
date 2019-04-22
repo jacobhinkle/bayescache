@@ -36,14 +36,14 @@ class P3B3(Dataset):
     test_label_file = 'test_labels.npy'
 
     def __init__(self, root, partition, subsite=True, 
-                 laterality=True, histology=True, grade=True,
+                 laterality=True, behavior=True, grade=True,
                  transform=None, target_transform=None, download=False):
         self.root = os.path.expanduser(root)
         self.transform = transform
         self.target_transform = target_transform
         self.subsite = subsite
         self.laterality = laterality
-        self.histology = histology
+        self.behavior = behavior 
         self.grade = grade
 
         if download:
@@ -81,8 +81,8 @@ class P3B3(Dataset):
             tasks['subsite'] = targets[:,0]
         if self.laterality:
             tasks['laterality'] = targets[:,1]
-        if self.histology:
-            tasks['histology'] = targets[:,2]
+        if self.behavior:
+            tasks['behavior'] = targets[:,2]
         if self.grade:
             tasks['grade'] = targets[:,3]
         

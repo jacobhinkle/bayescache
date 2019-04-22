@@ -109,7 +109,7 @@ class MTCNN(MultiTaskSupervisedModel):
         logits = {}
         logits['subsite'] = self.fc1(x)
         logits['laterality'] = self.fc2(x)
-        logits['histology'] = self.fc3(x)
+        logits['behavior'] = self.fc3(x)
         logits['grade'] = self.fc4(x)
 
         return logits
