@@ -17,11 +17,8 @@ def main():
     args = parser.parse_args()
 
     hparams = mtcnn.Hyperparameters()
-    # Update hyperparameters for the Synthetic data.
-    hparams.vocab_size = 4014
-    hparams.max_sent_len = 1500
-
     model = mtcnn.new(hparams)
+
     learner = api.Learner(device='cpu', model=model)
     optimizer = optim.RMSprop(model.parameters(), lr=7.0e-4, eps=1e-3)
 
