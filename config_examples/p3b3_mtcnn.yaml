@@ -1,22 +1,13 @@
-name: 'anon_mtcnn'
+name: 'p3b3_mtcnn'
 
 
 model:
   name: bayescache.models.mtcnn 
-  #hyperparameters:
-  #    kernel1 = 3
-  #    kernel2 = 4
-  #    kernel3 = 5
-  #    n_filters1 = 300
-  #    n_filters2 = 300
-  #    n_filters3 = 300
-  #    vocab_size = 3000
-  #    word_dim = 100
-  #    max_sent_len = 150
+
 
 source:
   name: bayescache.sources.anon
-  batch_size: 1 
+  batch_size: 128
   num_workers: 4
 
 
