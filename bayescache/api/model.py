@@ -2,10 +2,10 @@ import hashlib
 import torch
 import torch.nn as nn
 
-import vel.util.module_util as mu
+import bayescache.util.module_util as mu
 
-from bayescache.metrics.loss_metric import Loss
-from vel.util.summary import summary
+#from bayescache.metrics.loss_metric import Loss
+from bayescache.util.summary import summary
 
 
 class Model(nn.Module):

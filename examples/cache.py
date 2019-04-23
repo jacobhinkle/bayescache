@@ -1,5 +1,6 @@
 import argparse
 
+import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
 
@@ -12,8 +13,8 @@ def train(args, model, device, train_loader, optimizer, epoch):
     for batch_idx, (data, targets) in enumerate(train_loader):
         data = data.to(device)
 
-        for key, value in targets.item():
-            targets[key] = target[key].to(device)
+        for key, value in targets.items():
+            targets[key] = targets[key].to(device)
 
         optimizer.zero_grad()
         output = model(data)
@@ -32,10 +33,10 @@ def test(args, model, device, val_loader):
     val_loss = 0
     correct = 0
     with torch.no_grad():
-        for data, target in val_loader:
+        for data, targets in val_loader:
             data = data.to(device)
 
-            for key, value in targets.item():
+            for key, value in targets.items():
                 targets[key] = targets[key].to(device)
 
             output = model(data)
@@ -51,17 +52,27 @@ def main():
     parser.add_argument('--datapath', '-p', type=str, default='/home/ygx/data', help='Path to data.')
     parser.add_argument('--batchsize', '-bs', type=int, default=28, help='Batch size.')
     parser.add_argument('--epochs', '-e', type=int, default=10, help='Number of epochs.')
+    parser.add_argument('--no_cuda', action='store_true', default=False, help='disables CUDA training')
+    parser.add_argument('--log_interval', type=int, default=10, help='interval to log.')
     args = parser.parse_args()
 
-    train = P3B3(args.datapath, partition='train', download=True)
-    val = P3B3(args.datapath, partition='test', download=True)
+    use_cuda = not args.no_cuda and torch.cuda.is_available()
+    device = torch.device("cuda" if use_cuda else "cpu")
 
-    train_loader = DataLoader(train, batch_size=args.batchsize)
-    val_loader = DataLoader(val, batch_size=args.batchsize)
+    traindata = P3B3(args.datapath, partition='train', download=True)
+    valdata = P3B3(args.datapath, partition='test', download=True)
+
+    train_loader = DataLoader(traindata, batch_size=args.batchsize)
+    val_loader = DataLoader(valdata, batch_size=args.batchsize)
 
     model = mtcnn.new()
+    model = model.to(device)
     optimizer = optim.RMSprop(model.parameters(), lr=7.0e-4, eps=1e-3)
 
     for epoch in range(1, args.epochs + 1):
         train(args, model, device, train_loader, optimizer, epoch)
         test(args, model, device, val_loader)
+
+
+if __name__=='__main__':
+    main()
