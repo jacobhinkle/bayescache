@@ -36,7 +36,7 @@ def test(args, model, device, val_loader):
             data = data.to(device)
 
             for key, value in targets.item():
-                targets[key] = targets[key]to(device)
+                targets[key] = targets[key].to(device)
 
             output = model(data)
             loss = model.loss_value(data, targets, output, reduce='sum')
@@ -50,7 +50,7 @@ def main():
     parser = argparse.ArgumentParser(description='MTCNN P3B3')
     parser.add_argument('--datapath', '-p', type=str, default='/home/ygx/data', help='Path to data.')
     parser.add_argument('--batchsize', '-bs', type=int, default=28, help='Batch size.')
-    parser.add_argument('--epochs', '-e', type=int, default=10, help'Number of epochs.')
+    parser.add_argument('--epochs', '-e', type=int, default=10, help='Number of epochs.')
     args = parser.parse_args()
 
     train = P3B3(args.datapath, partition='train', download=True)
