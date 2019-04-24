@@ -148,7 +148,7 @@ def main():
     args = parser.parse_args()
 
     use_cuda = not args.no_cuda and torch.cuda.is_available()
-    device = torch.device("cuda" if use_cuda else "cpu")
+    device = torch.device("cuda:2" if use_cuda else "cpu")
 
     traindata = P3B3(args.datapath, partition='train', download=True)
     valdata = P3B3(args.datapath, partition='test', download=True)
