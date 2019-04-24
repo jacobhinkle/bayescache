@@ -15,7 +15,7 @@ class Hyperparameters:
     n_filters2 = 300
     n_filters3 = 300
     vocab_size = 35095
-    word_dim = 300
+    word_dim = 25
     max_sent_len=1500 
 
 
