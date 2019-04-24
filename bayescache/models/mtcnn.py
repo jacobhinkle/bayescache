@@ -15,7 +15,7 @@ class Hyperparameters:
     n_filters2 = 300
     n_filters3 = 300
     vocab_size = 35095
-    word_dim = 300
+    word_dim = 25
     max_sent_len=1500 
 
 
@@ -33,6 +33,7 @@ class Conv1d(nn.Module):
 
     def forward(self, x):
         x = F.relu(self.conv(x))
+        # Global max pool on all dims save batch.
         x = F.max_pool1d(x, x.size()[2:])
         return x
 
@@ -62,7 +63,6 @@ class MTCNN(MultiTaskSupervisedModel):
         self.conv1 = Conv1d(hparams.n_filters1, hparams.kernel1)
         self.conv2 = Conv1d(hparams.n_filters2, hparams.kernel2)
         self.conv3 = Conv1d(hparams.n_filters3, hparams.kernel3)
-        # TODO: Check the names of these labels. -> must match data. 
         self.fc1 = nn.Linear(self._sum_filters(), subsite_size)
         self.fc2 = nn.Linear(self._sum_filters(), laterality_size)
         self.fc3 = nn.Linear(self._sum_filters(), histology_size)
@@ -77,8 +77,6 @@ class MTCNN(MultiTaskSupervisedModel):
 
         losses = {}
         for key, value in y_true.items():
-            # TODO: test this bad boy.
-            # y_true and y_pred must have the same keys.
             losses[key] = F.cross_entropy(F.softmax(y_pred[key], dim=1), y_true[key])
 
         if reduce:
