@@ -1,7 +1,7 @@
 import os
 import time
 import argparse
-import numpy as numpy
+import numpy as np
 
 import torch
 import torch.optim as optim
@@ -108,7 +108,7 @@ def train(args, model, device, train_loader, optimizer, epoch, history):
         optimizer.zero_grad()
         output = model(data)
         loss = model.loss_value(data, targets, output, reduce='sum')
-        history.loss_meter.add_train_loss(loss)
+        history.loss_meter.add_train_loss(loss.item())
         loss.backward()
         optimizer.step()
 
@@ -131,7 +131,7 @@ def test(args, model, device, val_loader, history):
 
             output = model(data)
             loss = model.loss_value(data, targets, output, reduce='sum')
-            history.loss_meter.add_val_loss(loss)
+            history.loss_meter.add_val_loss(loss.item())
             val_loss += loss
 
     val_loss /= len(val_loader.dataset)
@@ -141,14 +141,14 @@ def test(args, model, device, val_loader, history):
 def main():
     parser = argparse.ArgumentParser(description='MTCNN P3B3')
     parser.add_argument('--datapath', '-p', type=str, default='/home/ygx/data', help='Path to data.')
-    parser.add_argument('--batchsize', '-bs', type=int, default=28, help='Batch size.')
+    parser.add_argument('--batchsize', '-bs', type=int, default=20, help='Batch size.')
     parser.add_argument('--epochs', '-e', type=int, default=10, help='Number of epochs.')
     parser.add_argument('--no_cuda', action='store_true', default=False, help='disables CUDA training')
     parser.add_argument('--log_interval', type=int, default=10, help='interval to log.')
     args = parser.parse_args()
 
     use_cuda = not args.no_cuda and torch.cuda.is_available()
-    device = torch.device("cuda:2" if use_cuda else "cpu")
+    device = torch.device("cuda:3" if use_cuda else "cpu")
 
     traindata = P3B3(args.datapath, partition='train', download=True)
     valdata = P3B3(args.datapath, partition='test', download=True)
@@ -172,8 +172,8 @@ def main():
     print(f'\n--- History ---')
     print(f'Runtime: {history.runtime}\n')
     print(f'Epochs: {history.num_epochs}\n')
-    print(f'Train Loss: {history.train_loss}\n')
-    print(f'Val Loss: {history.val_loss}')
+    print(f'Train Loss: {len(history.train_loss)}, {np.array(history.train_loss[-1]).shape}\n')
+    print(f'Val Loss: {len(history.val_loss)}, {np.array(history.val_loss[-1]).shape}')
 
 
 if __name__=='__main__':
