@@ -33,7 +33,7 @@ class Conv1d(nn.Module):
 
     def forward(self, x):
         x = F.relu(self.conv(x))
-        x = F.adaptive_max_pool1d(x, output_size=1)
+        x = F.max_pool1d(x, x.size()[2:])
         return x
 
 
@@ -79,7 +79,7 @@ class MTCNN(MultiTaskSupervisedModel):
         for key, value in y_true.items():
             # TODO: test this bad boy.
             # y_true and y_pred must have the same keys.
-            losses[key] = F.cross_entropy(F.softmax(y_pred[key]), y_true[key])
+            losses[key] = F.cross_entropy(F.softmax(y_pred[key], dim=1), y_true[key])
 
         if reduce:
             total = 0
