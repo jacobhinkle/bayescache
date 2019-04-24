@@ -1,4 +1,7 @@
+import os
+import time
 import argparse
+import numpy as numpy
 
 import torch
 import torch.optim as optim
@@ -8,7 +11,93 @@ from bayescache.data import P3B3
 from bayescache.models import mtcnn
 
 
-def train(args, model, device, train_loader, optimizer, epoch):
+class TimeMeter:
+    """Measure time"""
+    def __init__(self, name=None, savepath=None):
+        self.reset()
+        self.values = []
+        self.name = name
+        self.savepath = savepath
+
+    def reset(self):
+        self.n = 0
+        self.time = time.time()
+
+    def stop_timer(self):
+        time = time.time() - self.time
+        self.values.append(time)
+
+    def get_timings(self):
+        return self.values
+
+    def save(self):
+        savefile = os.path.join(self.savepath, self.name)
+        np.save(savefile, np.array(self.values))
+
+
+class EpochMeter:
+    """Count epochs"""
+    def __init__(self):
+        self.reset()
+
+    def reset(self):
+        self.n = 0
+    
+    def increment(self):
+        self.n += 1 
+
+    def get_counts(self):
+        return self.n
+
+
+class LossMeter:
+    """Record training and validation loss"""
+    def __init__(self):
+        self.reset()
+    
+    def reset(self):
+        self.train_loss = []
+        self.val_loss = []
+
+    def add_train_loss(self, loss):
+        self.train_loss.append(loss)
+
+    def add_val_loss(self, loss):
+        self.train_loss.append(loss)
+
+    def get_train_loss(self):
+        return self.train_loss
+    
+    def get_val_loss(self):
+        return self.val_loss
+
+
+class OptimizationHistory:
+    def __init__(self):
+        self.time_meter = TimeMeter()
+        self.epoch_meter = EpochMeter()
+        self.loss_meter = LossMeter()
+        self.reset()
+
+    def reset(self):
+        self.runtime = []
+        self.num_epochs = []
+        self.train_loss = []
+        self.val_loss = []
+
+    def reset_meters(self):
+        self.time_meter.reset()
+        self.epoch_meter.reset()
+        self.loss_meter.reset()
+    
+    def record_history(self):
+        self.runtime.append(self.time_meter.get_timings()) 
+        self.num_epochs.append(self.epoch_meter.get_counts())
+        self.train_loss.append(self.loss_meter.get_train_loss())
+        self.val_loss.append(self.loss_meter.get_val_loss())
+
+
+def train(args, model, device, train_loader, optimizer, epoch, history):
     model.train()
     for batch_idx, (data, targets) in enumerate(train_loader):
         data = data.to(device)
@@ -19,6 +108,7 @@ def train(args, model, device, train_loader, optimizer, epoch):
         optimizer.zero_grad()
         output = model(data)
         loss = model.loss_value(data, targets, output, reduce='sum')
+        history.loss_meter.add_train_loss(loss)
         loss.backward()
         optimizer.step()
 
@@ -28,7 +118,7 @@ def train(args, model, device, train_loader, optimizer, epoch):
                 100. * batch_idx / len(train_loader), loss.item()))
 
 
-def test(args, model, device, val_loader):
+def test(args, model, device, val_loader, history):
     model.eval()
     val_loss = 0
     correct = 0
@@ -41,6 +131,7 @@ def test(args, model, device, val_loader):
 
             output = model(data)
             loss = model.loss_value(data, targets, output, reduce='sum')
+            history.loss_meter.add_val_loss(loss)
             val_loss += loss
 
     val_loss /= len(val_loader.dataset)
@@ -68,10 +159,21 @@ def main():
     model = mtcnn.new()
     model = model.to(device)
     optimizer = optim.RMSprop(model.parameters(), lr=7.0e-4, eps=1e-3)
+    history = OptimizationHistory()
 
     for epoch in range(1, args.epochs + 1):
-        train(args, model, device, train_loader, optimizer, epoch)
-        test(args, model, device, val_loader)
+        train(args, model, device, train_loader, optimizer, epoch, history)
+        test(args, model, device, val_loader, history)
+        history.time_meter.stop_timer()
+        history.time_meter.reset()
+        history.epoch_meter.increment()
+
+    history.record_history()
+    print(f'\n--- History ---')
+    print(f'Runtime: {history.runtime}\n')
+    print(f'Epochs: {history.num_epochs}\n')
+    print(f'Train Loss: {history.train_loss}\n')
+    print(f'Val Loss: {history.val_loss}')
 
 
 if __name__=='__main__':
