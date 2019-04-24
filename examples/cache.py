@@ -24,8 +24,8 @@ class TimeMeter:
         self.time = time.time()
 
     def stop_timer(self):
-        time = time.time() - self.time
-        self.values.append(time)
+        seconds = time.time() - self.time
+        self.values.append(seconds)
 
     def get_timings(self):
         return self.values
