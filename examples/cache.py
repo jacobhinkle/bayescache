@@ -63,7 +63,7 @@ class LossMeter:
         self.train_loss.append(loss)
 
     def add_val_loss(self, loss):
-        self.train_loss.append(loss)
+        self.val_loss.append(loss)
 
     def get_train_loss(self):
         return self.train_loss
@@ -162,11 +162,11 @@ def main():
     history = OptimizationHistory()
 
     for epoch in range(1, args.epochs + 1):
+        history.epoch_meter.increment()
         train(args, model, device, train_loader, optimizer, epoch, history)
         test(args, model, device, val_loader, history)
         history.time_meter.stop_timer()
         history.time_meter.reset()
-        history.epoch_meter.increment()
 
     history.record_history()
     print(f'\n--- History ---')
