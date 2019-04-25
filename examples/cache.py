@@ -1,5 +1,8 @@
 import os
 import time
+import datetime
+
+import toml
 import argparse
 import numpy as np
 
@@ -65,10 +68,13 @@ class LossMeter:
 
 
 class OptimizationHistory:
-    def __init__(self):
+    """Records of the Bayesian optimization"""
+    def __init__(self, savepath=None, filename=None):
         self.time_meter = TimeMeter()
         self.epoch_meter = EpochMeter()
         self.loss_meter = LossMeter()
+        self.savepath = savepath
+        self.filename = filename
         self.reset()
 
     def reset(self):
@@ -87,6 +93,25 @@ class OptimizationHistory:
         self.num_epochs.append(self.epoch_meter.get_counts())
         self.train_loss.append(self.loss_meter.get_train_loss())
         self.val_loss.append(self.loss_meter.get_val_loss())
+
+    def save(self):
+        if self.savepath == None or self.filename == None:
+            raise ValueError("You must specify a savepath and filename to save results.")
+
+        now = datetime.datetime.now()
+
+        history = {
+            'Title': 'Optimization History',
+            'Date': now.strftime("%Y-%m-%d"),
+            'NumEpochs': self.num_epochs,
+            'Runtime': self.runtime,
+            'TrainLoss': self.train_loss,
+            'ValidationLoss': self.val_loss,
+        }
+        
+        savefile = os.path.join(self.savepath, self.filename)
+        with open(savefile, 'w') as outfile:
+            toml.dump(history, outfile)
 
 
 def train(args, model, device, train_loader, optimizer, epoch, history):
@@ -137,6 +162,7 @@ def main():
     parser.add_argument('--epochs', '-e', type=int, default=10, help='Number of epochs.')
     parser.add_argument('--no_cuda', action='store_true', default=False, help='disables CUDA training')
     parser.add_argument('--log_interval', type=int, default=10, help='interval to log.')
+    parser.add_argument('--savepath', type=str, '/home/ygx/src/bayescache/examples')
     args = parser.parse_args()
 
     use_cuda = not args.no_cuda and torch.cuda.is_available()
@@ -151,7 +177,7 @@ def main():
     model = mtcnn.new()
     model = model.to(device)
     optimizer = optim.RMSprop(model.parameters(), lr=7.0e-4, eps=1e-3)
-    history = OptimizationHistory()
+    history = OptimizationHistory(savepath=args.savepath, filename='history.toml')
 
     for opt in range(1, 3):
         for epoch in range(1, args.epochs + 1):
@@ -162,8 +188,8 @@ def main():
         history.time_meter.stop_timer()
         history.record_history()
         history.reset_meters()
+        history.save()
 
-    #history.record_history()
     print(f'\n--- History ---')
     print(f'Runtime: {history.runtime}\n')
     print(f'Epochs: {history.num_epochs}\n')
