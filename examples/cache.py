@@ -87,7 +87,7 @@ class PatienceMeter:
         else:
             self.counter += 1
         
-        if self.counter > patience:
+        if self.counter > self.patience:
             self.stop_early == True
     
     def get_stop_epoch(self):
