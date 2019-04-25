@@ -14,7 +14,7 @@ from bayescache.models import mtcnn
 class TimeMeter:
     """Measure time"""
     def __init__(self):
-        self.reset()
+        self.elapsed_time = 0.0 
 
     def reset(self):
         self.elapsed_time = 0.0 
@@ -30,7 +30,7 @@ class TimeMeter:
 class EpochMeter:
     """Count epochs"""
     def __init__(self):
-        self.reset()
+        self.n = 0
 
     def reset(self):
         self.n = 0
@@ -45,7 +45,8 @@ class EpochMeter:
 class LossMeter:
     """Record training and validation loss"""
     def __init__(self):
-        self.reset()
+        self.train_loss = []
+        self.val_loss = []
     
     def reset(self):
         self.train_loss = []
