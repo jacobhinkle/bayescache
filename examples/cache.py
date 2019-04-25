@@ -162,7 +162,7 @@ def main():
     parser.add_argument('--epochs', '-e', type=int, default=10, help='Number of epochs.')
     parser.add_argument('--no_cuda', action='store_true', default=False, help='disables CUDA training')
     parser.add_argument('--log_interval', type=int, default=10, help='interval to log.')
-    parser.add_argument('--savepath', type=str, '/home/ygx/src/bayescache/examples')
+    parser.add_argument('--savepath', type=str, default='/home/ygx/src/bayescache/examples')
     args = parser.parse_args()
 
     use_cuda = not args.no_cuda and torch.cuda.is_available()
