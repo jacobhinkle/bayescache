@@ -13,26 +13,18 @@ from bayescache.models import mtcnn
 
 class TimeMeter:
     """Measure time"""
-    def __init__(self, name=None, savepath=None):
+    def __init__(self):
         self.reset()
-        self.values = []
-        self.name = name
-        self.savepath = savepath
 
     def reset(self):
-        self.n = 0
+        self.elapsed_time = 0.0 
         self.time = time.time()
 
     def stop_timer(self):
-        seconds = time.time() - self.time
-        self.values.append(seconds)
+        self.elapsed_time = time.time() - self.time
 
     def get_timings(self):
-        return self.values
-
-    def save(self):
-        savefile = os.path.join(self.savepath, self.name)
-        np.save(savefile, np.array(self.values))
+        return self.elapsed_time
 
 
 class EpochMeter:
@@ -161,12 +153,15 @@ def main():
     optimizer = optim.RMSprop(model.parameters(), lr=7.0e-4, eps=1e-3)
     history = OptimizationHistory()
 
-    for epoch in range(1, args.epochs + 1):
-        history.epoch_meter.increment()
-        train(args, model, device, train_loader, optimizer, epoch, history)
-        test(args, model, device, val_loader, history)
+    for opt in range(1, 3):
+        for epoch in range(1, args.epochs + 1):
+            history.epoch_meter.increment()
+            train(args, model, device, train_loader, optimizer, epoch, history)
+            test(args, model, device, val_loader, history)
+           
         history.time_meter.stop_timer()
-        history.time_meter.reset()
+        history.record_history()
+        history.reset_meters()
 
     history.record_history()
     print(f'\n--- History ---')
