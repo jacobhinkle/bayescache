@@ -67,12 +67,40 @@ class LossMeter:
         return self.val_loss
 
 
+class PatienceMeter:
+    """Patience for validation improvement"""
+    def __init__(self, patience=5):
+        self.patience = patience
+        self.reset()
+
+    def reset(self):
+        self.counter = 0
+        self.epoch = 0
+        self.minimal_loss = 9e10
+        self.stop_early = False
+    
+    def check_loss(self, loss):
+        self.epoch += 1
+
+        if loss < self.minimal_loss:
+            self.minimal_loss = loss
+        else:
+            self.counter += 1
+        
+        if self.counter > patience:
+            self.stop_early == True
+    
+    def get_stop_epoch(self):
+        return self.epoch
+
+
 class OptimizationHistory:
     """Records of the Bayesian optimization"""
     def __init__(self, savepath=None, filename=None):
         self.time_meter = TimeMeter()
         self.epoch_meter = EpochMeter()
         self.loss_meter = LossMeter()
+        self.patience_meter = PatienceMeter()
         self.savepath = savepath
         self.filename = filename
         self.reset()
@@ -82,17 +110,20 @@ class OptimizationHistory:
         self.num_epochs = []
         self.train_loss = []
         self.val_loss = []
+        self.stop_epoch = []
 
     def reset_meters(self):
         self.time_meter.reset()
         self.epoch_meter.reset()
         self.loss_meter.reset()
+        self.patience_meter.reset()
     
     def record_history(self):
         self.runtime.append(self.time_meter.get_timings()) 
         self.num_epochs.append(self.epoch_meter.get_counts())
         self.train_loss.append(self.loss_meter.get_train_loss())
         self.val_loss.append(self.loss_meter.get_val_loss())
+        self.stop_epoch.append(self.patience_meter.get_stop_epoch())
 
     def save(self):
         if self.savepath == None or self.filename == None:
@@ -104,6 +135,7 @@ class OptimizationHistory:
             'Title': self.filename,
             'Date': now.strftime("%Y-%m-%d"),
             'NumEpochs': self.num_epochs,
+            'StopEpoch': self.stop_epoch,
             'Runtime': self.runtime,
             'TrainLoss': self.train_loss,
             'ValidationLoss': self.val_loss,
@@ -151,6 +183,7 @@ def test(args, model, device, val_loader, history):
             history.loss_meter.add_val_loss(loss.item())
             val_loss += loss
 
+    history.patience_meter.check_loss(val_loss)
     val_loss /= len(val_loader.dataset)
     print(f'\nValidation set: Average loss: {val_loss:.4f}\n')
 
@@ -184,6 +217,9 @@ def main():
             history.epoch_meter.increment()
             train(args, model, device, train_loader, optimizer, epoch, history)
             test(args, model, device, val_loader, history)
+            if history.patience_meter.stop_early:
+                print(f'Patience exceeded, stopping early!')
+                break
            
         history.time_meter.stop_timer()
         history.record_history()
@@ -193,6 +229,7 @@ def main():
     print(f'\n--- History ---')
     print(f'Runtime: {history.runtime}\n')
     print(f'Epochs: {history.num_epochs}\n')
+    print(f'Stop Epoch: {history.stop_epoch}')
     print(f'Train Loss: {len(history.train_loss)}, {np.array(history.train_loss[-1]).shape}\n')
     print(f'Val Loss: {len(history.val_loss)}, {np.array(history.val_loss[-1]).shape}')
 
