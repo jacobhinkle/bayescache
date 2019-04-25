@@ -101,7 +101,7 @@ class OptimizationHistory:
         now = datetime.datetime.now()
 
         history = {
-            'Title': 'Optimization History',
+            'Title': self.filename,
             'Date': now.strftime("%Y-%m-%d"),
             'NumEpochs': self.num_epochs,
             'Runtime': self.runtime,
