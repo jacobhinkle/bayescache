@@ -256,7 +256,7 @@ def main():
     ]
 
     gp_minimize(
-        lambda x: objective_function(
+        lambda x: objective(
             x, 
             args,
             device,
