@@ -11,7 +11,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 
 from skopt import gp_minimize
-from skopt.callbacks import CheckpointSaver
+from hyperspace.rover.checkpoints import JsonCheckpointSaver
 
 from bayescache.data import P3B3
 from bayescache.models import mtcnn
@@ -186,11 +186,11 @@ def test(args, model, device, val_loader, history):
             history.loss_meter.add_val_loss(loss.item())
             valid_loss += loss
 
-    history.patience_meter.check_loss(valid_loss)
     valid_loss /= len(val_loader.dataset)
-    print(f'\nValidation set: Average loss: {valid_loss:.4f}\n')
+    history.patience_meter.check_loss(valid_loss)
 
-    return valid_loss
+    print(f'\nValidation set: Average loss: {valid_loss:.4f}\n')
+    return valid_loss.item()
 
 
 def objective(hparams, args, device, train_loader, val_loader, history):
@@ -248,7 +248,9 @@ def main():
     val_loader = DataLoader(valdata, batch_size=args.batchsize)
 
     history = OptimizationHistory(savepath=args.savepath, filename='history.toml')
-    checkpoint_saver = CheckpointSaver(args.bayescheckpoint, compress=9)
+    checkpoint_saver = JsonCheckpointSaver(args.savepath, f'bayes_checkpoint')
+
+
 
     search_bounds = [
         (2, 6),  # kernel1
