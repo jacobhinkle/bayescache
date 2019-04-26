@@ -187,7 +187,7 @@ def test(args, model, device, val_loader, history):
             valid_loss += loss
 
     valid_loss /= len(val_loader.dataset)
-    valid_loss = round(valid_loss.item(), 6)
+    valid_loss = round(valid_loss.item(), 5)
     history.patience_meter.check_loss(valid_loss)
 
     print(f'\nValidation set: Average loss: {valid_loss:.4f}\n')
