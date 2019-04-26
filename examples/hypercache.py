@@ -172,7 +172,7 @@ def train(args, model, device, train_loader, optimizer, epoch, history):
 
 def test(args, model, device, val_loader, history):
     model.eval()
-    val_loss = 0
+    valid_loss = 0
     correct = 0
     with torch.no_grad():
         for data, targets in val_loader:
