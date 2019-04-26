@@ -187,10 +187,11 @@ def test(args, model, device, val_loader, history):
             valid_loss += loss
 
     valid_loss /= len(val_loader.dataset)
+    valid_loss = round(valid_loss.item(), 6)
     history.patience_meter.check_loss(valid_loss)
 
     print(f'\nValidation set: Average loss: {valid_loss:.4f}\n')
-    return valid_loss.item()
+    return valid_loss
 
 
 def objective(hparams, args, device, train_loader, val_loader, history):
@@ -249,8 +250,6 @@ def main():
 
     history = OptimizationHistory(savepath=args.savepath, filename='history.toml')
     checkpoint_saver = JsonCheckpointSaver(args.savepath, f'bayes_checkpoint')
-
-
 
     search_bounds = [
         (2, 6),  # kernel1
