@@ -193,7 +193,7 @@ def test(args, model, device, val_loader, history):
     return valid_loss
 
 
-def objective(hparams, args, device, optimizer, train_loader, val_loader, history):
+def objective(hparams, args, device, train_loader, val_loader, history):
     hyperparameters = mtcnn.Hyperparameters()
     hyperparameters.kernel1 = hparams[0]
     hyperparameters.kernel2 = hparams[1]
@@ -206,6 +206,7 @@ def objective(hparams, args, device, optimizer, train_loader, val_loader, histor
         model = mtcnn.new(hyperparameters=hyperparameters)
 
     model = model.to(device)
+    optimizer = optim.RMSprop(model.parameters(), lr=7.0e-4, eps=1e-3)
 
     for epoch in range(1, args.epochs + 1):
         history.epoch_meter.increment()
@@ -246,7 +247,6 @@ def main():
     train_loader = DataLoader(traindata, batch_size=args.batchsize)
     val_loader = DataLoader(valdata, batch_size=args.batchsize)
 
-    optimizer = optim.RMSprop(model.parameters(), lr=7.0e-4, eps=1e-3)
     history = OptimizationHistory(savepath=args.savepath, filename='history.toml')
     checkpoint_saver = CheckpointSaver(args.bayescheckpoint, compress=9)
 
@@ -260,7 +260,6 @@ def main():
             x, 
             args,
             device,
-            optimizer,
             train_loader,
             val_loader,
             history
