@@ -87,6 +87,7 @@ class PatienceMeter:
 
         if loss < self.minimal_loss:
             self.minimal_loss = loss
+            self.counter = 0
         else:
             self.counter += 1
 
