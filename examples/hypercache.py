@@ -91,7 +91,7 @@ class PatienceMeter:
             self.counter += 1
 
         if self.counter > self.patience:
-            self.stop_early == True
+            self.stop_early = True
 
     def get_stop_epoch(self):
         return self.epoch
@@ -258,19 +258,19 @@ def main():
 
     gp_minimize(
         lambda x: objective(
-            x, 
+            x,
             args,
             device,
             train_loader,
             val_loader,
             history
-        ),  
+        ),
         search_bounds,
         acq_func="LCB",
-        n_calls=20, 
+        n_calls=20,
         callback=[checkpoint_saver],
         random_state=777
-    )    
+    )
 
     print(f'\n--- History ---')
     print(f'Runtime: {history.runtime}\n')
