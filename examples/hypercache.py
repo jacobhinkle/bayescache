@@ -231,7 +231,7 @@ def main():
     parser = argparse.ArgumentParser(description='MTCNN P3B3')
     parser.add_argument('--datapath', '-p', type=str, default='/home/ygx/data', help='Path to data.')
     parser.add_argument('--batchsize', '-bs', type=int, default=20, help='Batch size.')
-    parser.add_argument('--epochs', '-e', type=int, default=10, help='Number of epochs.')
+    parser.add_argument('--epochs', '-e', type=int, default=25, help='Number of epochs.')
     parser.add_argument('--no_cuda', action='store_true', default=False, help='disables CUDA training')
     parser.add_argument('--log_interval', type=int, default=10, help='interval to log.')
     parser.add_argument('--savepath', type=str, default='/home/ygx/src/bayescache/examples')
@@ -248,8 +248,8 @@ def main():
     train_loader = DataLoader(traindata, batch_size=args.batchsize)
     val_loader = DataLoader(valdata, batch_size=args.batchsize)
 
-    history = OptimizationHistory(savepath=args.savepath, filename='history.toml')
-    checkpoint_saver = JsonCheckpointSaver(args.savepath, f'bayes_checkpoint')
+    history = OptimizationHistory(savepath=args.savepath, filename='history_cache.toml')
+    checkpoint_saver = JsonCheckpointSaver(args.savepath, f'bayes_cache_checkpoint')
 
     search_bounds = [
         (2, 6),  # kernel1
