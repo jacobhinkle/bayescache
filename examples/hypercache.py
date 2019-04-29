@@ -223,7 +223,11 @@ def objective(hparams, args, device, train_loader, val_loader, history):
     history.reset_meters()
     history.save()
 
-    torch.save(model.state_dict(), args.modelstate)
+    cache_model = not args.no_cache
+
+    if cache_model:
+        print(f'Caching model!')
+        torch.save(model.state_dict(), args.modelstate)
 
     return valid_loss
 
@@ -238,6 +242,7 @@ def main():
     parser.add_argument('--savepath', type=str, default='/home/ygx/src/bayescache/examples')
     parser.add_argument('--modelstate', type=str, default='/home/ygx/src/bayescache/examples/hyperstate')
     parser.add_argument('--bayescheckpoint', type=str, default='/home/ygx/src/bayescache/examples/checkpoint.pkl')
+    parser.add_argument('--no_cache', action='store_true', default=False, help='Disables model cache')
     args = parser.parse_args()
 
     use_cuda = not args.no_cuda and torch.cuda.is_available()
