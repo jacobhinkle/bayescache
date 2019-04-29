@@ -77,7 +77,7 @@ class MTCNN(MultiTaskSupervisedModel):
 
         losses = {}
         for key, value in y_true.items():
-            losses[key] = F.cross_entropy(F.softmax(y_pred[key], dim=1), y_true[key])
+            losses[key] = F.nll_loss(F.log_softmax(y_pred[key], dim=1), y_true[key])
 
         if reduce:
             total = 0

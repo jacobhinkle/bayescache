@@ -208,7 +208,7 @@ def objective(hparams, args, device, train_loader, val_loader, history):
         model = mtcnn.new(hyperparameters=hyperparameters)
 
     model = model.to(device)
-    optimizer = optim.RMSprop(model.parameters(), lr=7.0e-4, eps=1e-3)
+    optimizer = optim.Adadelta(model.parameters())
 
     for epoch in range(1, args.epochs + 1):
         history.epoch_meter.increment()
