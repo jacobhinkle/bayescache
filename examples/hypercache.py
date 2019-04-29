@@ -3,6 +3,7 @@ import time
 import datetime
 
 import toml
+import json
 import argparse
 import numpy as np
 
@@ -11,6 +12,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 
 from skopt import gp_minimize
+from skopt.space.space import Space
 from hyperspace.rover.checkpoints import JsonCheckpointSaver
 
 from bayescache.data import P3B3
@@ -255,12 +257,25 @@ def main():
     val_loader = DataLoader(valdata, batch_size=args.batchsize)
 
     history = OptimizationHistory(savepath=args.savepath, filename='history_cache.toml')
+    checkpoint_file = os.path.join(args.savepath, f'bayes_cache_checkpoint')
     checkpoint_saver = JsonCheckpointSaver(args.savepath, f'bayes_cache_checkpoint')
 
     search_bounds = [
         (2, 6),  # kernel1
         (2, 6)   # kernel2
     ]
+
+    try:
+        with open(checkpoint_file) as infile:  
+            res = json.load(infile)
+        x0 = res['x_iters']
+        y0 = res['func_vals']
+    except FileNotFoundError:
+        print(f'No previous save point for Bayesian optimization. Starting fresh!')
+        # Need to randomly sample the bounds to prime the optimization.
+        space = Space(search_bounds)
+        x0 = space.rvs(1)
+        y0 = None
 
     gp_minimize(
         lambda x: objective(
@@ -272,8 +287,11 @@ def main():
             history
         ),
         search_bounds,
+        x0=x0,
+        y0=y0,  
         acq_func="LCB",
         n_calls=20,
+        n_random_starts=0,
         callback=[checkpoint_saver],
         random_state=777
     )
