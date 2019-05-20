@@ -209,6 +209,8 @@ def main():
     rank = comm.Get_rank()
     size = comm.Get_size()
 
+    set_seed(0)
+
     use_cuda = not args.no_cuda and torch.cuda.is_available()
     device = torch.device("cuda:3" if use_cuda else "cpu")
 
