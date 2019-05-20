@@ -10,9 +10,12 @@ import numpy as np
 import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
+from torchvision import transforms
+from torchvision.datasets import FashionMNIST
 
 from mpi4py import MPI
 from bayescache.models import mlp
+from bayescache.util.random import set_seed
 
 
 class TimeMeter:
@@ -150,15 +153,14 @@ class OptimizationHistory:
 
 def train(args, model, device, train_loader, optimizer, epoch, history):
     model.train()
-    for batch_idx, (data, targets) in enumerate(train_loader):
+    for batch_idx, (data, target) in enumerate(train_loader):
+        data = data.view(-1, 784)
         data = data.to(device)
-
-        for key, value in targets.items():
-            targets[key] = targets[key].to(device)
+        target = target.to(device)
 
         optimizer.zero_grad()
         output = model(data)
-        loss = model.loss_value(data, targets, output, reduce='sum')
+        loss = model.loss_value(data, target, output)
         history.loss_meter.add_train_loss(loss.item())
         loss.backward()
         optimizer.step()
@@ -174,14 +176,13 @@ def test(args, model, device, val_loader, history):
     valid_loss = 0
     correct = 0
     with torch.no_grad():
-        for data, targets in val_loader:
+        for data, target in val_loader:
+            data = data.view(-1, 784)
             data = data.to(device)
-
-            for key, value in targets.items():
-                targets[key] = targets[key].to(device)
+            target = target.to(device)
 
             output = model(data)
-            loss = model.loss_value(data, targets, output, reduce='sum')
+            loss = model.loss_value(data, target, output)
             history.loss_meter.add_val_loss(loss.item())
             valid_loss += loss
 
@@ -195,31 +196,32 @@ def test(args, model, device, val_loader, history):
 
 def main():
     parser = argparse.ArgumentParser(description='MTCNN P3B3')
-    parser.add_argument('--datapath', '-p', type=str, default='/home/ygx/data', help='Path to data.')
+    parser.add_argument('--datapath', '-p', type=str, default='/Users/yngtodd/data', help='Path to data.')
     parser.add_argument('--batchsize', '-bs', type=int, default=20, help='Batch size.')
     parser.add_argument('--epochs', '-e', type=int, default=25, help='Number of epochs.')
     parser.add_argument('--no_cuda', action='store_true', default=False, help='disables CUDA training')
     parser.add_argument('--log_interval', type=int, default=10, help='interval to log.')
-    parser.add_argument('--savepath', type=str, default='/home/ygx/src/bayescache/output/seeds/mlp')
+    parser.add_argument('--savepath', type=str, default='/Users/yngtodd/src/ornl/bayescache/output/seeds/mlp')
     parser.add_argument('--no_cache', action='store_true', default=False, help='Disables model cache')
     args = parser.parse_args()
 
-    comm = MPI.COMM_WORLD
-    rank = comm.Get_rank()
-    size = comm.Get_size()
+    #comm = MPI.COMM_WORLD
+    #rank = comm.Get_rank()
+    #size = comm.Get_size()
+    rank = 0
 
     use_cuda = not args.no_cuda and torch.cuda.is_available()
     device = torch.device("cuda:3" if use_cuda else "cpu")
 
-    traindata = P3B3(args.datapath, partition='train', download=True)
-    valdata = P3B3(args.datapath, partition='test', download=True)
+    traindata = FashionMNIST(args.datapath, train=True, download=True, transform=transforms.ToTensor())
+    valdata = FashionMNIST(args.datapath, train=False, download=True, transform=transforms.ToTensor())
 
-    train_loader = DataLoader(traindata, batch_size=args.batchsize)
-    val_loader = DataLoader(valdata, batch_size=args.batchsize)
+    train_loader = DataLoader(traindata, batch_size=args.batchsize, shuffle=False, num_workers=0)
+    val_loader = DataLoader(valdata, batch_size=args.batchsize, shuffle=False, num_workers=0)
 
     history = OptimizationHistory(savepath=args.savepath, filename=f'history{rank}.toml')
 
-    model = mtcnn.new(input_size=784)
+    model = mlp.new(input_size=784)
     model = model.to(device)
 
     optimizer = optim.Adam(model.parameters())

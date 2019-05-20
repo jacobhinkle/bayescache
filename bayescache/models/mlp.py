@@ -14,7 +14,7 @@ class Hyperparameters:
 
 class MLP(SupervisedModel):
 
-    def __init__(self, hparams, input_size, n_classes=10)
+    def __init__(self, hparams, input_size, n_classes=10):
         super(MLP, self).__init__()
         self.hp = hparams
         self.fc1 = nn.Linear(input_size, self.hp.n_hidden1)
