@@ -205,10 +205,9 @@ def main():
     parser.add_argument('--no_cache', action='store_true', default=False, help='Disables model cache')
     args = parser.parse_args()
 
-    #comm = MPI.COMM_WORLD
-    #rank = comm.Get_rank()
-    #size = comm.Get_size()
-    rank = 0
+    comm = MPI.COMM_WORLD
+    rank = comm.Get_rank()
+    size = comm.Get_size()
 
     use_cuda = not args.no_cuda and torch.cuda.is_available()
     device = torch.device("cuda:3" if use_cuda else "cpu")
