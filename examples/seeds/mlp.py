@@ -17,6 +17,7 @@ from mpi4py import MPI
 
 from bayescache.models import mlp
 from bayescache.util.random import set_seed
+from bayescache.metrics import accuracy_topk
 from bayescache.meters import OptimizationHistory
 
 
@@ -31,13 +32,16 @@ def train(args, model, device, train_loader, optimizer, epoch, history):
         output = model(data)
         loss = model.loss_value(data, target, output)
         history.loss_meter.add_train_loss(loss.item())
+        acc1, acc2 = accuracy_topk(output, target, topk=(1, 2))
+        history.top1_train.update(acc1[0], data.size(0))
         loss.backward()
         optimizer.step()
 
         if batch_idx % args.log_interval == 0:
-            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}, Acc@1: {}'.format(
                 epoch, batch_idx * len(data), len(train_loader.dataset),
-                100. * batch_idx / len(train_loader), loss.item()))
+                100. * batch_idx / len(train_loader), loss.item(),
+                acc1[0]))
 
 
 def test(args, model, device, val_loader, history):
@@ -51,6 +55,8 @@ def test(args, model, device, val_loader, history):
             target = target.to(device)
 
             output = model(data)
+            acc1, acc2 = accuracy_topk(output, target, topk=(1, 2))
+            history.top1_valid.update(acc1[0], data.size(0))
             loss = model.loss_value(data, target, output)
             history.loss_meter.add_valid_loss(loss.item())
             valid_loss += loss
@@ -58,7 +64,7 @@ def test(args, model, device, val_loader, history):
     valid_loss /= len(val_loader.dataset)
     valid_loss = round(valid_loss.item(), 5)
 
-    print(f'\nValidation set: Average loss: {valid_loss:.4f}\n')
+    print(f'\nValidation set: Average loss: {valid_loss:.4f}\n, Acc@1: {type(history.top1_valid.avg)}')
     return valid_loss
 
 

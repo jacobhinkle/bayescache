@@ -6,19 +6,22 @@ import datetime
 import pandas as pd
 
 from bayescache.meters import (
-    EpochMeter, LossMeter, PatienceMeter, TimeMeter
+    AverageMeter, EpochMeter, LossMeter, PatienceMeter, TimeMeter
 )
 
 
 class OptimizationHistory:
     """Records of the optimization"""
-    def __init__(self, savepath=None, experiment_name=None, rank=0):
+    def __init__(self, savepath=None, experiment_name=None, seeds=None, rank=0):
         self.time_meter = TimeMeter()
         self.epoch_meter = EpochMeter()
         self.loss_meter = LossMeter()
         self.patience_meter = PatienceMeter()
+        self.top1_train = AverageMeter('Acc@1', ':6.2f')
+        self.top1_valid = AverageMeter('Acc@1', ':6.24f')
         self.savepath = savepath
         self.experiment_name = experiment_name
+        self.seeds = seeds
         self.rank = rank
         self.reset()
 
@@ -54,9 +57,15 @@ class OptimizationHistory:
             'NumEpochs': self.num_epochs,
             'StopEpoch': self.stop_epoch,
             'Runtime': self.runtime,
+            'Acc@1TrainAvg': self.top1_train.avg.item(),
+            'Acc@1ValidAvg': self.top1_valid.avg.item(),
+            'Seeds': self.seeds
         }
 
-        metafile = os.path.join(self.savepath, 'metadata.toml')
+        meta_dir = os.path.join(self.savepath, 'metadata')
+        os.makedirs(meta_dir, exist_ok=True)
+        metafile = os.path.join(meta_dir, f'metadata{self.rank}.toml')
+
         with open(metafile, 'w') as outfile:
             toml.dump(metadata, outfile)
 

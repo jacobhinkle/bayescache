@@ -1,3 +1,4 @@
+from .average import AverageMeter
 from .epoch import EpochMeter
 from .loss import LossMeter
 from .patience import PatienceMeter
