@@ -75,8 +75,10 @@ def main():
     parser.add_argument('--epochs', '-e', type=int, default=25, help='Number of epochs.')
     parser.add_argument('--no_cuda', action='store_true', default=False, help='disables CUDA training')
     parser.add_argument('--log_interval', type=int, default=10, help='interval to log.')
-    parser.add_argument('--savepath', type=str, default='/Users/yngtodd/src/ornl/bayescache/output/seeds/mlp')
+    parser.add_argument('--savepath', type=str, default='/Users/yngtodd/src/ornl/bayescache/output/seeds/shuffle_mlp')
     parser.add_argument('--no_cache', action='store_true', default=False, help='Disables model cache')
+    parser.add_argument('--shuffle', action='store_true', help='Shuffle the data')
+    parser.add_argument('--num_workers', type=int, default=0, help='num threads for data loaders.')
     args = parser.parse_args()
 
     comm = MPI.COMM_WORLD
@@ -87,17 +89,35 @@ def main():
     seedcontrol.fix_all_seeds(rank)
 
     use_cuda = not args.no_cuda and torch.cuda.is_available()
-    device = torch.device("cuda:3" if use_cuda else "cpu")
+    device = torch.device("cuda" if use_cuda else "cpu")
 
     traindata = FashionMNIST(args.datapath, train=True, download=True, transform=transforms.ToTensor())
     valdata = FashionMNIST(args.datapath, train=False, download=True, transform=transforms.ToTensor())
 
-    train_loader = DataLoader(traindata, batch_size=args.batchsize, shuffle=False, num_workers=0)
-    val_loader = DataLoader(valdata, batch_size=args.batchsize, shuffle=False, num_workers=0)
+    train_loader = DataLoader(
+        traindata, 
+        batch_size=args.batchsize, 
+        shuffle=args.shuffle, 
+        num_workers=args.num_workers
+    )
+   
+    val_loader = DataLoader(
+        valdata, 
+        batch_size=args.batchsize, 
+        shuffle=args.shuffle, 
+        num_workers=args.num_workers
+    )
+
+    dataloader_info = {
+        'shuffle': args.shuffle,
+        'num_workers': args.num_workers
+    }
 
     history = OptimizationHistory(
         savepath=args.savepath, 
         experiment_name='mlp_fashionmnist', 
+        device = device,
+        dataloader_info = dataloader_info,
         seeds = seedcontrol.get_seeds(),
         rank=rank
     )

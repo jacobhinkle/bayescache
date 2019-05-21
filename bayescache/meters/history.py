@@ -12,7 +12,8 @@ from bayescache.meters import (
 
 class OptimizationHistory:
     """Records of the optimization"""
-    def __init__(self, savepath=None, experiment_name=None, seeds=None, rank=0):
+    def __init__(self, savepath=None, experiment_name=None, 
+                 device=None, dataloader_info=None, seeds=None, rank=0):
         self.time_meter = TimeMeter()
         self.epoch_meter = EpochMeter()
         self.loss_meter = LossMeter()
@@ -21,6 +22,8 @@ class OptimizationHistory:
         self.top1_valid = AverageMeter('Acc@1', ':6.24f')
         self.savepath = savepath
         self.experiment_name = experiment_name
+        self.device = device
+        self.dataloader_info = dataloader_info
         self.seeds = seeds
         self.rank = rank
         self.reset()
@@ -54,11 +57,13 @@ class OptimizationHistory:
         metadata = {
             'Title': self.experiment_name,
             'Date': now.strftime("%Y-%m-%d"),
+            'Device': self.device,
             'NumEpochs': self.num_epochs,
             'StopEpoch': self.stop_epoch,
             'Runtime': self.runtime,
             'Acc@1TrainAvg': self.top1_train.avg.item(),
             'Acc@1ValidAvg': self.top1_valid.avg.item(),
+            'Dataloaders': self.dataloader_info,
             'Seeds': self.seeds
         }
 
