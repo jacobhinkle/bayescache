@@ -116,9 +116,9 @@ def main():
     history = OptimizationHistory(
         savepath=args.savepath, 
         experiment_name='mlp_fashionmnist', 
-        device = device,
-        dataloader_info = dataloader_info,
-        seeds = seedcontrol.get_seeds(),
+        device=device,
+        dataloader_info=dataloader_info,
+        seeds=seedcontrol.get_seeds(),
         rank=rank
     )
 
