@@ -16,8 +16,8 @@ from torchvision.datasets import FashionMNIST
 from mpi4py import MPI
 
 from bayescache.models import mlp
-from bayescache.util.random import set_seed
 from bayescache.metrics import accuracy_topk
+from bayescache.util.random import SeedControl
 from bayescache.meters import OptimizationHistory
 
 
@@ -64,7 +64,7 @@ def test(args, model, device, val_loader, history):
     valid_loss /= len(val_loader.dataset)
     valid_loss = round(valid_loss.item(), 5)
 
-    print(f'\nValidation set: Average loss: {valid_loss:.4f}\n, Acc@1: {type(history.top1_valid.avg)}')
+    print(f'\nValidation set: Average loss: {valid_loss:.4f}\n, Acc@1: {history.top1_valid.avg}')
     return valid_loss
 
 
@@ -83,7 +83,8 @@ def main():
     rank = comm.Get_rank()
     size = comm.Get_size()
 
-    set_seed(rank)
+    seedcontrol = SeedControl()
+    seedcontrol.fix_all_seeds(rank)
 
     use_cuda = not args.no_cuda and torch.cuda.is_available()
     device = torch.device("cuda:3" if use_cuda else "cpu")
@@ -94,7 +95,12 @@ def main():
     train_loader = DataLoader(traindata, batch_size=args.batchsize, shuffle=False, num_workers=0)
     val_loader = DataLoader(valdata, batch_size=args.batchsize, shuffle=False, num_workers=0)
 
-    history = OptimizationHistory(savepath=args.savepath, experiment_name='mlp_fashionmnist', rank=rank)
+    history = OptimizationHistory(
+        savepath=args.savepath, 
+        experiment_name='mlp_fashionmnist', 
+        seeds = seedcontrol.get_seeds(),
+        rank=rank
+    )
 
     model = mlp.new(input_size=784)
     model = model.to(device)
