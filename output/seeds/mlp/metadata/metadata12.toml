@@ -1,0 +1,18 @@
+Title = "mlp_fashionmnist"
+Date = "2019-05-21"
+Device = "device(type='cpu')"
+NumEpochs = [ 20,]
+StopEpoch = [ 0,]
+Runtime = [ 401.1352117061615,]
+"Acc@1TrainAvg" = 85.23981475830078
+"Acc@1ValidAvg" = 83.51499938964844
+
+[Dataloaders]
+shuffle = false
+num_workers = 0
+
+[Seeds]
+PythonHash = 12
+PythonRand = 12
+Numpy = 12
+Torch = 12

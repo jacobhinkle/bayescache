@@ -70,12 +70,12 @@ def test(args, model, device, val_loader, history):
 
 def main():
     parser = argparse.ArgumentParser(description='MTCNN P3B3')
-    parser.add_argument('--datapath', '-p', type=str, default='/Users/yngtodd/data', help='Path to data.')
+    parser.add_argument('--datapath', '-p', type=str, default='/home/ygx/data', help='Path to data.')
     parser.add_argument('--batchsize', '-bs', type=int, default=20, help='Batch size.')
     parser.add_argument('--epochs', '-e', type=int, default=25, help='Number of epochs.')
     parser.add_argument('--no_cuda', action='store_true', default=False, help='disables CUDA training')
     parser.add_argument('--log_interval', type=int, default=10, help='interval to log.')
-    parser.add_argument('--savepath', type=str, default='/Users/yngtodd/src/ornl/bayescache/output/seeds/shuffle_mlp')
+    parser.add_argument('--savepath', type=str, default='/home/ygx/src/bayescache/output/seeds/mlp')
     parser.add_argument('--no_cache', action='store_true', default=False, help='Disables model cache')
     parser.add_argument('--shuffle', action='store_true', help='Shuffle the data')
     parser.add_argument('--num_workers', type=int, default=0, help='num threads for data loaders.')

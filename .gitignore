@@ -35,9 +35,9 @@ nosetests.xml
 .pydevproject
 
 # Complexity
-output/*.html
-output/*/index.html
-output/
+#output/*.html
+#output/*/index.html
+#output/
 
 # Sphinx
 docs/_build
